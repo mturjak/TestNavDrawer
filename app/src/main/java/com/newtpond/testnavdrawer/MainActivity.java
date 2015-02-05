@@ -71,6 +71,10 @@ public class MainActivity extends ActionBarActivity
                 mTitle = getString(R.string.title_section3);
                 break;
         }
+
+        if(mIsDrawerLocked) {
+            restoreActionBar();
+        }
     }
 
     public void restoreActionBar() {
