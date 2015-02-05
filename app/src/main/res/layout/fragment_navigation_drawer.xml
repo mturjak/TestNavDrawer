@@ -16,7 +16,7 @@
         android:layout_marginBottom="@dimen/user_profile_img_margin_bottom"
         android:src="@drawable/ic_launcher" />
 
-    <ListView android:layout_width="match_parent"
+    <com.newtpond.testnavdrawer.widget.CheckableLinearLayout android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/user_menu"
         android:layout_below="@+id/user_profile_pic"

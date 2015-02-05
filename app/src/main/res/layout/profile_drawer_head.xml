@@ -1,0 +1,28 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp"
+    android:weightSum="1">
+
+    <ImageView
+        android:id="@+id/user_profile_img"
+        android:layout_width="@dimen/user_profile_img_size"
+        android:layout_height="@dimen/user_profile_img_size"
+        android:contentDescription="User Avatar"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/user_profile_img_margin_top"
+        android:layout_marginBottom="@dimen/user_profile_img_margin_bottom"
+        android:src="@drawable/ic_launcher" />
+
+    <TextView
+        android:id="@+id/user_name"
+        android:layout_below="@+id/user_profile_img"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text = "Dummy Text"
+        android:textSize="18sp" />
+
+</RelativeLayout>

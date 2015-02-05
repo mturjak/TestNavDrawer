@@ -1,17 +1,17 @@
 package com.newtpond.testnavdrawer;
 
-import android.graphics.Color;
-import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.ListFragment;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,17 +19,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import com.newtpond.testnavdrawer.widget.ProfileMenuItem;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
  * design guidelines</a> for a complete explanation of the behaviors implemented here.
  */
-public class NavigationDrawerFragment extends Fragment {
+public class NavigationDrawerFragment extends ListFragment {
 
     /**
      * Remember the position of the selected item.
@@ -56,6 +60,7 @@ public class NavigationDrawerFragment extends Fragment {
     private ListView mDrawerListView;
     private View mFragmentContainerView;
     private RelativeLayout mDrawerView;
+    private List<ProfileMenuItem> mDrawerItems;
 
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
@@ -131,6 +136,14 @@ public class NavigationDrawerFragment extends Fragment {
                 selectItem(position);
             }
         });
+
+        mDrawerItems = new ArrayList<ProfileMenuItem>();
+        mDrawerItems.add(new ProfileMenuItem("User", "Martin Turjak", 0));
+        mDrawerItems.add(new ProfileMenuItem("Section 1", getString(R.string.title_section1), 2));
+        mDrawerItems.add(new ProfileMenuItem("Section 2", getString(R.string.title_section2), 15));
+        mDrawerItems.add(new ProfileMenuItem("Section 3", getString(R.string.title_section3), 7));
+
+        /*
         mDrawerListView.setAdapter(new ArrayAdapter<String>(
                 getActionBar().getThemedContext(),
                 android.R.layout.simple_list_item_activated_1,
@@ -139,7 +152,14 @@ public class NavigationDrawerFragment extends Fragment {
                         getString(R.string.title_section1),
                         getString(R.string.title_section2),
                         getString(R.string.title_section3),
+                        getString(R.string.title_section1)
                 }));
+        */
+
+
+        ProfileDrawerAdapter adapter = new ProfileDrawerAdapter(mDrawerListView.getContext(), mDrawerItems);
+        setListAdapter(adapter);
+
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
 
         if(locked) {

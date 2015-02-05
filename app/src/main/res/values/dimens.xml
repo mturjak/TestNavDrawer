@@ -7,7 +7,9 @@
          https://developer.android.com/design/patterns/navigation-drawer.html -->
     <dimen name="navigation_drawer_width">240dp</dimen>
     <dimen name="drawer_content_padding">0dp</dimen>
-    <dimen name="user_profile_img_size">120dp</dimen>
-    <dimen name="user_profile_img_margin_top">32dp</dimen>
-    <dimen name="user_profile_img_margin_bottom">16dp</dimen>
+
+    <!-- User profile (in nav drawer) setup -->
+    <dimen name="user_profile_img_size">80dp</dimen>
+    <dimen name="user_profile_img_margin_top">8dp</dimen>
+    <dimen name="user_profile_img_margin_bottom">12dp</dimen>
 </resources>
