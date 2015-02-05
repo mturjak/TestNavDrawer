@@ -1,5 +1,6 @@
 package com.newtpond.testnavdrawer;
 
+import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
 import android.support.v7.app.ActionBar;
@@ -126,15 +127,19 @@ public class NavigationDrawerFragment extends Fragment {
         mFragmentContainerView = getActivity().findViewById(fragmentId);
         mDrawerLayout = drawerLayout;
 
-        mIsDrawerLocked = locked;
+        if(locked) {
+            mIsDrawerLocked = true;
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN, mFragmentContainerView);
+            drawerLayout.setScrimColor(Color.RED);
+        } else {
+            // set a custom shadow that overlays the main content when the drawer opens
+            mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+            // set up the drawer's list view with items and click listener
 
-        // set a custom shadow that overlays the main content when the drawer opens
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        // set up the drawer's list view with items and click listener
-
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+            ActionBar actionBar = getActionBar();
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+        }
 
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the navigation drawer and the action bar app icon.
@@ -197,7 +202,7 @@ public class NavigationDrawerFragment extends Fragment {
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);
         }
-        if (mDrawerLayout != null) {
+        if (mDrawerLayout != null && !mIsDrawerLocked) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
         if (mCallbacks != null) {

@@ -36,6 +36,7 @@ public class MainActivity extends ActionBarActivity
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+
         mTitle = getTitle();
 
         // drawer_content_padding is set to 0 on handsets and to 240 on tablets,
