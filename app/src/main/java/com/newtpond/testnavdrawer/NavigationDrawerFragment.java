@@ -1,17 +1,19 @@
 package com.newtpond.testnavdrawer;
 
-import android.app.Activity;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.graphics.Color;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.ListFragment;
+import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
+import android.support.v7.app.ActionBar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -57,9 +59,8 @@ public class NavigationDrawerFragment extends ListFragment {
     private ActionBarDrawerToggle mDrawerToggle;
 
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerListView;
     private View mFragmentContainerView;
-    private RelativeLayout mDrawerView;
+    private ListView mDrawerListView;
     private List<ProfileMenuItem> mDrawerItems;
 
     private int mCurrentSelectedPosition = 0;
@@ -108,10 +109,9 @@ public class NavigationDrawerFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mDrawerView = (RelativeLayout) inflater.inflate(
-                R.layout.fragment_navigation_drawer, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
 
-        return mDrawerView;
+        return rootView;
     }
 
     public boolean isDrawerOpen() {
@@ -128,20 +128,13 @@ public class NavigationDrawerFragment extends ListFragment {
         mFragmentContainerView = getActivity().findViewById(fragmentId);
         mDrawerLayout = drawerLayout;
 
-        mDrawerListView = (ListView) mFragmentContainerView.findViewById(R.id.user_menu);
-
-        mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectItem(position);
-            }
-        });
-
         mDrawerItems = new ArrayList<ProfileMenuItem>();
         mDrawerItems.add(new ProfileMenuItem("User", "Martin Turjak", 0));
         mDrawerItems.add(new ProfileMenuItem("Section 1", getString(R.string.title_section1), 2));
         mDrawerItems.add(new ProfileMenuItem("Section 2", getString(R.string.title_section2), 15));
         mDrawerItems.add(new ProfileMenuItem("Section 3", getString(R.string.title_section3), 7));
+        mDrawerItems.add(new ProfileMenuItem("Section 4", getString(R.string.title_section2), 15));
+        mDrawerItems.add(new ProfileMenuItem("Section 5", getString(R.string.title_section3), 7));
 
         /*
         mDrawerListView.setAdapter(new ArrayAdapter<String>(
@@ -156,11 +149,26 @@ public class NavigationDrawerFragment extends ListFragment {
                 }));
         */
 
-
-        ProfileDrawerAdapter adapter = new ProfileDrawerAdapter(mDrawerListView.getContext(), mDrawerItems);
+        ProfileDrawerAdapter adapter = new ProfileDrawerAdapter(getListView().getContext());
+        adapter.updateItems(mDrawerItems);
         setListAdapter(adapter);
 
-        mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
+        getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+        Log.v("listView",getListView().toString());
+
+        mDrawerListView = getListView();
+        getListView().setSelector(R.drawable.list_selector);
+
+        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id)
+            {
+                selectItem(position);
+            }
+        });
+
+        getListView().setItemChecked(mCurrentSelectedPosition, true);
 
         if(locked) {
             mIsDrawerLocked = true;
@@ -235,7 +243,7 @@ public class NavigationDrawerFragment extends ListFragment {
     private void selectItem(int position) {
         mCurrentSelectedPosition = position;
         if (mDrawerListView != null) {
-            mDrawerListView.setItemChecked(position, true);
+            getListView().setItemChecked(position, true);
         }
         if (mDrawerLayout != null && !mIsDrawerLocked) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);

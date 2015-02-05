@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="12dp"
-    android:weightSum="1">
+    android:weightSum="1"
+    android:background="@drawable/list_selector" >
 
     <TextView
         android:id="@+id/user_name"
@@ -11,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:gravity="center"
+        android:text="test"
         android:textSize="18sp" />
 
 </LinearLayout>

@@ -25,12 +25,6 @@ final class ProfileDrawerAdapter extends BaseAdapter {
         mLayoutInflater = LayoutInflater.from(context);
     }
 
-    public ProfileDrawerAdapter(Context context, List<ProfileMenuItem> items) {
-        mContext = context;
-        mItems = items;
-        mLayoutInflater = LayoutInflater.from(context);
-    }
-
     public void updateItems(List<ProfileMenuItem> items) {
         mItems = items;
         notifyDataSetChanged();
@@ -52,14 +46,22 @@ final class ProfileDrawerAdapter extends BaseAdapter {
     }
 
     @Override
+    public boolean isEnabled(int position) {
+        if(position == 0) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        ProfileMenuItem item = getItem(position);
+        //ProfileMenuItem item = getItem(position);
 
         if (convertView == null) {
             if(position == 0) {
                 convertView = mLayoutInflater.inflate(R.layout.profile_drawer_head, null);
-            } else if(item.getItemName() == "item") {
+            } else /*if(item.getItemName() == "item")*/ {
                 convertView = mLayoutInflater.inflate(R.layout.profile_drawer_item, null);
             }
         }
