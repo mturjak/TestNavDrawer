@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.TextView;
 
 import com.newtpond.testnavdrawer.widget.ProfileMenuItem;
 
@@ -47,24 +48,30 @@ final class ProfileDrawerAdapter extends BaseAdapter {
 
     @Override
     public boolean isEnabled(int position) {
-        if(position == 0) {
+        /*if(position == 0) {
             return false;
-        }
+        }*/
         return true;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        //ProfileMenuItem item = getItem(position);
+        ProfileMenuItem item = getItem(position);
+        String itemText = item.getItemValue();
 
         if (convertView == null) {
             if(position == 0) {
                 convertView = mLayoutInflater.inflate(R.layout.profile_drawer_head, null);
+                itemText = itemText.toUpperCase();
             } else /*if(item.getItemName() == "item")*/ {
                 convertView = mLayoutInflater.inflate(R.layout.profile_drawer_item, null);
+                if ( position % 2 == 1)
+                    convertView.setBackgroundResource(R.drawable.list_selector_odd);
             }
         }
+
+        ((TextView) convertView.findViewById(R.id.user_name)).setText(itemText);
 
         /*String gravatarUrl = Gravatar.init()
                 .with(user.getEmail())

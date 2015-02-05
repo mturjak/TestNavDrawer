@@ -157,7 +157,6 @@ public class NavigationDrawerFragment extends ListFragment {
         if(locked) {
             mIsDrawerLocked = true;
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN, mFragmentContainerView);
-            drawerLayout.setScrimColor(Color.RED);
         } else {
             // set a custom shadow that overlays the main content when the drawer opens
             mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
