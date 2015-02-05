@@ -1,19 +1,17 @@
 package com.newtpond.testnavdrawer;
 
-import android.graphics.Color;
-import android.support.v4.app.ListFragment;
-import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.ListFragment;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.newtpond.testnavdrawer.widget.ProfileMenuItem;
@@ -129,6 +126,8 @@ public class NavigationDrawerFragment extends ListFragment {
         mDrawerLayout = drawerLayout;
 
         mDrawerItems = new ArrayList<ProfileMenuItem>();
+
+        // TODO: load data from server
         mDrawerItems.add(new ProfileMenuItem("User", "Martin Turjak", 0));
         mDrawerItems.add(new ProfileMenuItem("Section 1", getString(R.string.title_section1), 2));
         mDrawerItems.add(new ProfileMenuItem("Section 2", getString(R.string.title_section2), 15));
@@ -136,26 +135,11 @@ public class NavigationDrawerFragment extends ListFragment {
         mDrawerItems.add(new ProfileMenuItem("Section 4", getString(R.string.title_section2), 15));
         mDrawerItems.add(new ProfileMenuItem("Section 5", getString(R.string.title_section3), 7));
 
-        /*
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                new String[]{
-                        getString(R.string.title_section1),
-                        getString(R.string.title_section2),
-                        getString(R.string.title_section3),
-                        getString(R.string.title_section1)
-                }));
-        */
-
         ProfileDrawerAdapter adapter = new ProfileDrawerAdapter(getListView().getContext());
         adapter.updateItems(mDrawerItems);
         setListAdapter(adapter);
 
         getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-
-        Log.v("listView",getListView().toString());
 
         mDrawerListView = getListView();
         getListView().setSelector(R.drawable.list_selector);
