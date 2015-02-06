@@ -12,8 +12,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:gravity="center"
-        android:text="test"
-        android:textSize="18sp"
+        android:textSize="12sp"
+        android:paddingTop="@dimen/drawer_item_padding"
+        android:paddingBottom="@dimen/drawer_item_padding"
         android:textColor="@color/list_selector" />
 
 </LinearLayout>

@@ -3,7 +3,6 @@ package com.newtpond.testnavdrawer;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -128,21 +127,18 @@ public class NavigationDrawerFragment extends ListFragment {
         mDrawerItems = new ArrayList<ProfileMenuItem>();
 
         // TODO: load data from server
-        mDrawerItems.add(new ProfileMenuItem("User", "Martin Turjak", 0));
-        mDrawerItems.add(new ProfileMenuItem("Section 1", getString(R.string.title_section1), 2));
-        mDrawerItems.add(new ProfileMenuItem("Section 2", getString(R.string.title_section2), 15));
-        mDrawerItems.add(new ProfileMenuItem("Section 3", getString(R.string.title_section3), 7));
-        mDrawerItems.add(new ProfileMenuItem("Section 4", getString(R.string.title_section2), 15));
-        mDrawerItems.add(new ProfileMenuItem("Section 5", getString(R.string.title_section3), 7));
+        mDrawerItems.add(new ProfileMenuItem("martinturjak@gmail.com", "Martin Turjak", 0));
+        mDrawerItems.add(new ProfileMenuItem("Grab the moment", getString(R.string.title_section1), 2));
+        mDrawerItems.add(new ProfileMenuItem("Share the moment", getString(R.string.title_section2), 15));
+        mDrawerItems.add(new ProfileMenuItem("Friends", getString(R.string.title_section3), 7));
+        mDrawerItems.add(new ProfileMenuItem("Favourites", getString(R.string.title_section4), 15));
+        mDrawerItems.add(new ProfileMenuItem("Conversations", getString(R.string.title_section5), 7));
 
         ProfileDrawerAdapter adapter = new ProfileDrawerAdapter(getListView().getContext());
         adapter.updateItems(mDrawerItems);
         setListAdapter(adapter);
 
-        getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-
         mDrawerListView = getListView();
-        getListView().setSelector(R.drawable.list_selector);
 
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

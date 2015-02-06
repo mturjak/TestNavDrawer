@@ -59,16 +59,14 @@ final class ProfileDrawerAdapter extends BaseAdapter {
 
         ProfileMenuItem item = getItem(position);
         String itemText = item.getItemValue();
+        itemText = itemText.toUpperCase();
 
-        if (convertView == null) {
-            if(position == 0) {
-                convertView = mLayoutInflater.inflate(R.layout.profile_drawer_head, null);
-                itemText = itemText.toUpperCase();
-            } else /*if(item.getItemName() == "item")*/ {
-                convertView = mLayoutInflater.inflate(R.layout.profile_drawer_item, null);
-                if ( position % 2 == 1)
-                    convertView.setBackgroundResource(R.drawable.list_selector_odd);
-            }
+        if(position == 0) {
+            if (convertView == null) { convertView = mLayoutInflater.inflate(R.layout.profile_drawer_head, null); }
+
+        } else {
+            if (convertView == null) { convertView = mLayoutInflater.inflate(R.layout.profile_drawer_item, null); }
+            if (position % 2 == 1) { convertView.setBackgroundResource(R.drawable.list_selector_odd); }
         }
 
         ((TextView) convertView.findViewById(R.id.user_name)).setText(itemText);

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="12dp"
-    android:weightSum="1">
+    android:weightSum="1" >
 
     <ImageView
         android:id="@+id/user_profile_img"
@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:textSize="18sp"
+        android:paddingBottom="@dimen/user_profile_margin_bottom"
         android:textColor="#dddddd" />
 
 </RelativeLayout>

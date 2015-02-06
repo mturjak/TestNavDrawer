@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">TestNavDrawer</string>
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="app_name">ViklerTest</string>
+    <string name="title_section1">Grab the moment</string>
+    <string name="title_section2">Share the moment</string>
+    <string name="title_section3">Friends</string>
+    <string name="title_section4">Favourites</string>
+    <string name="title_section5">Conversations</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
