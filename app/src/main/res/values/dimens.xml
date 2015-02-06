@@ -13,6 +13,10 @@
     <dimen name="user_profile_img_margin_top">8dp</dimen>
     <dimen name="user_profile_img_margin_bottom">12dp</dimen>
     <dimen name="user_profile_margin_bottom">8dp</dimen>
-    <dimen name="drawer_item_padding">6dp</dimen>
+    <dimen name="drawer_item_padding">16dp</dimen>
+    <dimen name="drawer_item_text_padding">6dp</dimen>
     <dimen name="user_profile_name">14sp</dimen>
+    <dimen name="item_ico_size">32dp</dimen>
+    <dimen name="drawer_item_padding_x">10dp</dimen>
+    <dimen name="drawer_item_ico_padding">8dp</dimen>
 </resources>

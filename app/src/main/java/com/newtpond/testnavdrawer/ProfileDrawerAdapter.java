@@ -1,6 +1,7 @@
 package com.newtpond.testnavdrawer;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -85,17 +86,37 @@ final class ProfileDrawerAdapter extends BaseAdapter {
 
             Picasso.with(mContext)
                     .load(gravatarUrl)
-                    .placeholder(R.drawable.ic_launcher)
-                    .error(R.drawable.ic_launcher)
+                    .placeholder(R.drawable.ic_contact_picture)
+                    .error(R.drawable.ic_contact_picture)
                     .transform(transformation)
                     .into((ImageView) convertView.findViewById(R.id.user_profile_img));
 
         } else {
-            if (convertView == null) { convertView = mLayoutInflater.inflate(R.layout.profile_drawer_item, null); }
+            if (convertView == null) {
+                if (item.getItemName() == "ic_logout_32") {
+                    convertView = mLayoutInflater.inflate(R.layout.profile_drawer_logout, null);
+                } else {
+                    convertView = mLayoutInflater.inflate(R.layout.profile_drawer_item, null);
+                }
+            }
             if (position % 2 == 1) { convertView.setBackgroundResource(R.drawable.list_selector_odd); }
+
+            int drawableResourceId = mContext.getResources().getIdentifier(item.getItemName(), "drawable", mContext.getPackageName());
+            ((ImageView) convertView.findViewById(R.id.drawer_item_ico)).setImageResource(drawableResourceId);
+
+            if (item.getItemName() != "ic_logout_32") {
+                TextView counter = (TextView) convertView.findViewById(R.id.drawer_item_num);
+                counter.setText(item.getItemNum() + "");
+
+                // TODO: if timestamp newer add unread identifier (make bold or add badge):
+                if (position == 4) {
+                    counter.setTypeface(counter.getTypeface(), Typeface.BOLD);
+                    counter.setTextColor(0xeeee3333);
+                }
+            }
         }
 
-        ((TextView) convertView.findViewById(R.id.user_name)).setText(itemText);
+        ((TextView) convertView.findViewById(R.id.drawer_item_name)).setText(itemText);
 
         /*((TextView) convertView.findViewById(R.id.user_name)).setText(user.getUsername());*/
 

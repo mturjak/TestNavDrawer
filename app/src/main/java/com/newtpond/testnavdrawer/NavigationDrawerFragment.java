@@ -128,11 +128,12 @@ public class NavigationDrawerFragment extends ListFragment {
 
         // TODO: load data from server
         mDrawerItems.add(new ProfileMenuItem("martin.turjak@gmail.com", "Martin Turjak", 0));
-        mDrawerItems.add(new ProfileMenuItem("Grab the moment", getString(R.string.title_section1), 2));
-        mDrawerItems.add(new ProfileMenuItem("Share the moment", getString(R.string.title_section2), 15));
-        mDrawerItems.add(new ProfileMenuItem("Friends", getString(R.string.title_section3), 7));
-        mDrawerItems.add(new ProfileMenuItem("Favourites", getString(R.string.title_section4), 15));
-        mDrawerItems.add(new ProfileMenuItem("Conversations", getString(R.string.title_section5), 7));
+        mDrawerItems.add(new ProfileMenuItem("ic_grab_32", getString(R.string.title_section1), 2));
+        mDrawerItems.add(new ProfileMenuItem("ic_share_32", getString(R.string.title_section2), 15));
+        mDrawerItems.add(new ProfileMenuItem("ic_friends_32", getString(R.string.title_section3), 7));
+        mDrawerItems.add(new ProfileMenuItem("ic_like_32", getString(R.string.title_section4), 15));
+        mDrawerItems.add(new ProfileMenuItem("ic_chat_32", getString(R.string.title_section5), 7));
+        mDrawerItems.add(new ProfileMenuItem("ic_logout_32", "Logout", 0));
 
         ProfileDrawerAdapter adapter = new ProfileDrawerAdapter(getListView().getContext());
         adapter.updateItems(mDrawerItems);
@@ -150,6 +151,12 @@ public class NavigationDrawerFragment extends ListFragment {
 
         getListView().setItemChecked(mCurrentSelectedPosition, true);
 
+        ActionBar actionBar = getActionBar();
+
+        /* actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setLogo(R.drawable.ic_vikler);
+        actionBar.setDisplayUseLogoEnabled(true); */
+
         if(locked) {
             mIsDrawerLocked = true;
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN, mFragmentContainerView);
@@ -158,7 +165,6 @@ public class NavigationDrawerFragment extends ListFragment {
             mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
             // set up the drawer's list view with items and click listener
 
-            ActionBar actionBar = getActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
         }

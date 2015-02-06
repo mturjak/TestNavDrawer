@@ -33,17 +33,4 @@
         android:layout_toRightOf="@+id/drawer_item_ico"
         android:layout_toEndOf="@+id/drawer_item_ico" />
 
-    <TextView
-        android:id="@+id/drawer_item_num"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textSize="12sp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:background="@drawable/bg_counter"
-        android:padding="@dimen/drawer_item_text_padding"
-        android:minWidth="42dp"
-        android:textColor="#202222" />
-
 </RelativeLayout>
