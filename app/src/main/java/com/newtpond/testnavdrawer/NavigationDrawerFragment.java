@@ -127,7 +127,7 @@ public class NavigationDrawerFragment extends ListFragment {
         mDrawerItems = new ArrayList<ProfileMenuItem>();
 
         // TODO: load data from server
-        mDrawerItems.add(new ProfileMenuItem("martinturjak@gmail.com", "Martin Turjak", 0));
+        mDrawerItems.add(new ProfileMenuItem("martin.turjak@gmail.com", "Martin Turjak", 0));
         mDrawerItems.add(new ProfileMenuItem("Grab the moment", getString(R.string.title_section1), 2));
         mDrawerItems.add(new ProfileMenuItem("Share the moment", getString(R.string.title_section2), 15));
         mDrawerItems.add(new ProfileMenuItem("Friends", getString(R.string.title_section3), 7));

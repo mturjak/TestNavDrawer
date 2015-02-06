@@ -7,6 +7,7 @@ public class ProfileMenuItem {
     private String mItemName;
     private String mItemValue;
     private String mItemType;
+    private String mItemEmail;
     private int mItemNum = 0;
 
     public ProfileMenuItem(String itemName, String itemValue, int itemNum) {
@@ -14,10 +15,15 @@ public class ProfileMenuItem {
         mItemValue = itemValue;
         mItemNum = itemNum;
         mItemType = "item";
+        mItemEmail = itemName;
     }
 
     public int getItemNum() {
         return mItemNum;
+    }
+
+    public String getEmail() {
+        return mItemEmail;
     }
 
     public String getItemName() {
