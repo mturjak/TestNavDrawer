@@ -1,6 +1,7 @@
 package com.newtpond.testnavdrawer;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,8 +9,10 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.makeramen.RoundedTransformationBuilder;
 import com.newtpond.testnavdrawer.widget.ProfileMenuItem;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Transformation;
 
 import java.util.Collections;
 import java.util.List;
@@ -75,18 +78,16 @@ final class ProfileDrawerAdapter extends BaseAdapter {
                     .size(mAvatarImageViewPixelSize)
                     .build();
 
-            /*
             Transformation transformation = new RoundedTransformationBuilder()
                     .cornerRadiusDp(mAvatarImageViewPixelSize/2)
                     .oval(false)
                     .build();
-            */
 
             Picasso.with(mContext)
                     .load(gravatarUrl)
                     .placeholder(R.drawable.ic_launcher)
                     .error(R.drawable.ic_launcher)
-                            //.transform(transformation)
+                    .transform(transformation)
                     .into((ImageView) convertView.findViewById(R.id.user_profile_img));
 
         } else {
