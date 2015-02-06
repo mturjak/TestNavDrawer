@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:textSize="18sp"
+        android:textSize="@dimen/user_profile_name"
         android:paddingBottom="@dimen/user_profile_margin_bottom"
         android:textColor="#dddddd" />
 

@@ -9,4 +9,5 @@
     <dimen name="user_profile_img_size">100dp</dimen>
     <dimen name="user_profile_img_margin_top">22dp</dimen>
     <dimen name="user_profile_margin_bottom">34dp</dimen>
+    <dimen name="user_profile_name">18sp</dimen>
 </resources>
