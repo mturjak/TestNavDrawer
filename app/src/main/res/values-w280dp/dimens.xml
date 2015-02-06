@@ -1,0 +1,3 @@
+<resources>
+    <dimen name="login_text_field_width">280dp</dimen>
+</resources>

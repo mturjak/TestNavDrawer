@@ -11,4 +11,7 @@
     <dimen name="user_profile_margin_bottom">34dp</dimen>
     <dimen name="user_profile_name">18sp</dimen>
     <dimen name="drawer_item_padding_x">16dp</dimen>
+
+    <!-- Login form -->
+    <bool name="login_portrait_only">false</bool>
 </resources>

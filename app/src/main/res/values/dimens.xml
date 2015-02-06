@@ -19,4 +19,10 @@
     <dimen name="item_ico_size">32dp</dimen>
     <dimen name="drawer_item_padding_x">10dp</dimen>
     <dimen name="drawer_item_ico_padding">8dp</dimen>
+
+    <!-- login form -->
+    <dimen name="login_text_field_width">-2px</dimen>
+    <dimen name="login_field_ico_size">18dp</dimen>
+    <dimen name="login_field_padding_left">34dp</dimen>
+    <bool name="login_portrait_only">true</bool>
 </resources>

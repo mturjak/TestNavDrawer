@@ -15,5 +15,11 @@
     <string name="title_activity_drawer">DrawerActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_login">LoginActivity</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="login_button_label">LOG IN</string>
+    <string name="signup_text">Don\'t have an account yet? Sign up here!</string>
+    <string name="login_error_message">Sorry! Something went wrong.</string>
+    <string name="login_error_title">Login error</string>
 
 </resources>
