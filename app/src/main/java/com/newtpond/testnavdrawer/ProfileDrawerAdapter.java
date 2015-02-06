@@ -46,6 +46,27 @@ final class ProfileDrawerAdapter extends BaseAdapter {
         return mItems.size();
     }
 
+
+    // this needs to be set to the number of different row layout types
+    @Override
+    public int getViewTypeCount() {
+        return 3;
+    }
+
+    // TODO: this is just set to accomodate teh dummy list ... acjust for real data
+    @Override
+    public int getItemViewType(int position) {
+        String itemName = mItems.get(position).getItemName();
+        switch(itemName) {
+            case "martin.turjak@gmail.com":
+                return 0;
+            case "logout":
+                return 1;
+            default:
+                return 2;
+        }
+    }
+
     @Override
     public ProfileMenuItem getItem(int position) {
         return mItems.get(position);
@@ -70,9 +91,13 @@ final class ProfileDrawerAdapter extends BaseAdapter {
         ProfileMenuItem item = getItem(position);
         String itemText = item.getItemValue();
         itemText = itemText.toUpperCase();
+        String itemName = item.getItemName();
+        int type = getItemViewType(position);
 
-        if(position == 0) {
-            if (convertView == null) { convertView = mLayoutInflater.inflate(R.layout.profile_drawer_head, null); }
+        if(type == 0) {
+            if (convertView == null)
+                convertView = mLayoutInflater.inflate(R.layout.profile_drawer_head, null);
+
             String gravatarUrl = Gravatar.init()
                     .with(item.getEmail())
                     .force404()
@@ -92,19 +117,21 @@ final class ProfileDrawerAdapter extends BaseAdapter {
                     .into((ImageView) convertView.findViewById(R.id.user_profile_img));
 
         } else {
-            if (convertView == null) {
-                if (item.getItemName() == "ic_logout_32") {
+            if (type == 1) {
+                if (convertView == null)
                     convertView = mLayoutInflater.inflate(R.layout.profile_drawer_logout, null);
-                } else {
+
+            } else {
+                if (convertView == null)
                     convertView = mLayoutInflater.inflate(R.layout.profile_drawer_item, null);
-                }
-            }
-            if (position % 2 == 1) { convertView.setBackgroundResource(R.drawable.list_selector_odd); }
 
-            int drawableResourceId = mContext.getResources().getIdentifier(item.getItemName(), "drawable", mContext.getPackageName());
-            ((ImageView) convertView.findViewById(R.id.drawer_item_ico)).setImageResource(drawableResourceId);
+                int drawableResourceId = mContext.getResources().getIdentifier(itemName, "drawable", mContext.getPackageName());
 
-            if (item.getItemName() != "ic_logout_32") {
+                ImageView icon = (ImageView) convertView.findViewById(R.id.drawer_item_logo);
+
+                icon.setImageResource(drawableResourceId);
+
+
                 TextView counter = (TextView) convertView.findViewById(R.id.drawer_item_num);
                 counter.setText(item.getItemNum() + "");
 
@@ -114,6 +141,8 @@ final class ProfileDrawerAdapter extends BaseAdapter {
                     counter.setTextColor(0xeeee3333);
                 }
             }
+            if (position % 2 == 1)
+                convertView.setBackgroundResource(R.drawable.list_selector_odd);
         }
 
         ((TextView) convertView.findViewById(R.id.drawer_item_name)).setText(itemText);

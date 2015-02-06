@@ -12,11 +12,11 @@
     android:background="@drawable/list_selector" >
 
     <ImageView
-        android:id="@+id/drawer_item_ico"
+        android:id="@+id/drawer_item_logo"
         android:layout_width="@dimen/item_ico_size"
         android:layout_height="@dimen/item_ico_size"
-        android:src="@drawable/ic_grab_32"
         android:padding="@dimen/drawer_item_ico_padding"
+        android:src="@drawable/ic_chat"
         android:layout_marginRight="6dp"
         android:layout_marginEnd="6dp"
         android:background="@drawable/bg_item_ico" />
@@ -30,8 +30,8 @@
         android:padding="@dimen/drawer_item_text_padding"
         android:textColor="@color/list_selector"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/drawer_item_ico"
-        android:layout_toEndOf="@+id/drawer_item_ico" />
+        android:layout_toRightOf="@+id/drawer_item_logo"
+        android:layout_toEndOf="@+id/drawer_item_logo" />
 
     <TextView
         android:id="@+id/drawer_item_num"

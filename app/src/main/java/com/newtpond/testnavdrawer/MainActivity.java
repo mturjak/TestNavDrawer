@@ -1,17 +1,23 @@
 package com.newtpond.testnavdrawer;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.parse.ParseUser;
 
 
 public class MainActivity extends ActionBarActivity
@@ -34,6 +40,14 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ParseUser currentUser = null;
+        if (currentUser != null) {
+            // do stuff with the user
+            // Log.i(TAG, currentUser.getUsername());
+        } else {
+            navigateTo(LoginActivity.class, true);
+        }
+
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
 
@@ -48,6 +62,16 @@ public class MainActivity extends ActionBarActivity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout),
                 mIsDrawerLocked);
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void navigateTo(final Class<? extends Activity> activityClass, boolean clearTask) {
+        Intent intent = new Intent(this, activityClass);
+        if(clearTask) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        }
+        startActivity(intent);
     }
 
     @Override

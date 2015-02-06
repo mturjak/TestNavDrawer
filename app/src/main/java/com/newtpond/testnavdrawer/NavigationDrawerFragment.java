@@ -128,12 +128,12 @@ public class NavigationDrawerFragment extends ListFragment {
 
         // TODO: load data from server
         mDrawerItems.add(new ProfileMenuItem("martin.turjak@gmail.com", "Martin Turjak", 0));
-        mDrawerItems.add(new ProfileMenuItem("ic_grab_32", getString(R.string.title_section1), 2));
-        mDrawerItems.add(new ProfileMenuItem("ic_share_32", getString(R.string.title_section2), 15));
-        mDrawerItems.add(new ProfileMenuItem("ic_friends_32", getString(R.string.title_section3), 7));
-        mDrawerItems.add(new ProfileMenuItem("ic_like_32", getString(R.string.title_section4), 15));
-        mDrawerItems.add(new ProfileMenuItem("ic_chat_32", getString(R.string.title_section5), 7));
-        mDrawerItems.add(new ProfileMenuItem("ic_logout_32", "Logout", 0));
+        mDrawerItems.add(new ProfileMenuItem("ic_grab", getString(R.string.title_section1), 2));
+        mDrawerItems.add(new ProfileMenuItem("ic_share", getString(R.string.title_section2), 15));
+        mDrawerItems.add(new ProfileMenuItem("ic_friends", getString(R.string.title_section3), 7));
+        mDrawerItems.add(new ProfileMenuItem("ic_like", getString(R.string.title_section4), 15));
+        mDrawerItems.add(new ProfileMenuItem("ic_chat", getString(R.string.title_section5), 7));
+        mDrawerItems.add(new ProfileMenuItem("logout", "Logout", 1));
 
         ProfileDrawerAdapter adapter = new ProfileDrawerAdapter(getListView().getContext());
         adapter.updateItems(mDrawerItems);
@@ -201,7 +201,7 @@ public class NavigationDrawerFragment extends ListFragment {
                     mUserLearnedDrawer = true;
                     SharedPreferences sp = PreferenceManager
                             .getDefaultSharedPreferences(getActivity());
-                    sp.edit().putBoolean(PREF_USER_LEARNED_DRAWER, true).apply();
+                    sp.edit().putBoolean(PREF_USER_LEARNED_DRAWER, true).commit(); // use .apply() in newer sdk's
                 }
 
                 getActivity().supportInvalidateOptionsMenu(); // calls onPrepareOptionsMenu()
