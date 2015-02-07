@@ -102,6 +102,15 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="29dp" />
 
-
+    <Button
+        android:layout_width="@dimen/login_text_field_width"
+        android:layout_height="wrap_content"
+        android:text="fb login"
+        android:id="@+id/fbLoginButton"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/signupText"
+        android:layout_centerHorizontal="true"
+        android:textColor="#eeeeeeee"
+        android:background="@drawable/bg_pill_black" />
 
 </RelativeLayout>

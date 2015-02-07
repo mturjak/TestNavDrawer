@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.newtpond.testnavdrawer"
-        minSdkVersion 8
+        minSdkVersion 9
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -29,4 +29,5 @@ dependencies {
     compile 'com.parse.bolts:bolts-android:1.+'
     compile fileTree(dir: 'libs', include: 'Parse-*.jar')
     compile 'com.makeramen:roundedimageview:1.5.0'
+    compile 'com.facebook.android:facebook-android-sdk:3.21.1'
 }
