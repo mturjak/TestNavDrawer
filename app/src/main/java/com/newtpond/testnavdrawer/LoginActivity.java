@@ -38,6 +38,29 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        /* TODO: use this to generate hash for facebook app
+        // - has to be run after package generated again as the hash changes ... and then deleted so it does not log
+        //
+        PackageInfo info;
+        try {
+            info = getPackageManager().getPackageInfo("com.newtpond.testnavdrawer", PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md;
+                md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                String something = new String(Base64.encode(md.digest(), 0));
+                //String something = new String(Base64.encodeBytes(md.digest()));
+                Log.e("hash key", something);
+            }
+        } catch (PackageManager.NameNotFoundException e1) {
+            Log.e("name not found", e1.toString());
+        } catch (NoSuchAlgorithmException e) {
+            Log.e("no such an algorithm", e.toString());
+        } catch (Exception e) {
+            Log.e("exception", e.toString());
+        }
+        */
+
         if(getResources().getBoolean(R.bool.login_portrait_only)){
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
@@ -158,6 +181,12 @@ public class LoginActivity extends Activity {
                             if (user != null) {
                                 ParseUser.getCurrentUser().put("firstName",
                                         user.getFirstName());
+                                ParseUser.getCurrentUser().put("lastName",
+                                        user.getLastName());
+                                ParseUser.getCurrentUser().put("displayName",
+                                        user.getName());
+                                ParseUser.getCurrentUser().put("facebookId",
+                                        user.getId());
                                 ParseUser.getCurrentUser().saveInBackground();
                                 finishActivity();
                             } else if (response.getError() != null) {

@@ -22,9 +22,12 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.newtpond.testnavdrawer.widget.ProfileMenuItem;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import fr.tkeunebr.gravatar.Gravatar;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -62,8 +65,11 @@ public class NavigationDrawerFragment extends ListFragment {
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
+    private String mAvatarUrl;
 
     private boolean mIsDrawerLocked;
+
+    private ParseUser mCurrentUser;
 
     public NavigationDrawerFragment() {
     }
@@ -71,6 +77,21 @@ public class NavigationDrawerFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mCurrentUser = ParseUser.getCurrentUser();
+        if(mCurrentUser != null) {
+            // prepare user profile info for the drawer
+            if(mCurrentUser.get("facebookId").toString().equals("0")) {
+                // if no facebookId try getting a Gravatar
+                mAvatarUrl = Gravatar.init()
+                        .with(mCurrentUser.getEmail())
+                        .force404()
+                        .size(getResources().getDimensionPixelSize(R.dimen.user_profile_img_size))
+                        .build();
+            } else {
+                mAvatarUrl = "https://graph.facebook.com/" + mCurrentUser.get("facebookId").toString() + "/picture?type=large";
+            }
+        }
 
         // Read in the flag indicating whether or not the user has demonstrated awareness of the
         // drawer. See PREF_USER_LEARNED_DRAWER for details.
@@ -127,13 +148,13 @@ public class NavigationDrawerFragment extends ListFragment {
         mDrawerItems = new ArrayList<ProfileMenuItem>();
 
         // TODO: load data from server
-        mDrawerItems.add(new ProfileMenuItem("martin.turjak@gmail.com", "Martin Turjak", 0));
-        mDrawerItems.add(new ProfileMenuItem("ic_grab", getString(R.string.title_section1), 2));
-        mDrawerItems.add(new ProfileMenuItem("ic_share", getString(R.string.title_section2), 15));
-        mDrawerItems.add(new ProfileMenuItem("ic_friends", getString(R.string.title_section3), 7));
-        mDrawerItems.add(new ProfileMenuItem("ic_like", getString(R.string.title_section4), 15));
-        mDrawerItems.add(new ProfileMenuItem("ic_chat", getString(R.string.title_section5), 7));
-        mDrawerItems.add(new ProfileMenuItem("logout", "Logout", 1));
+        mDrawerItems.add(new ProfileMenuItem( mCurrentUser.get("displayName").toString(), mAvatarUrl, 0, 0));
+        mDrawerItems.add(new ProfileMenuItem( getString(R.string.title_section1), "ic_grab",2, 2));
+        mDrawerItems.add(new ProfileMenuItem( getString(R.string.title_section2), "ic_share", 15, 2));
+        mDrawerItems.add(new ProfileMenuItem( getString(R.string.title_section3), "ic_friends", 7, 2));
+        mDrawerItems.add(new ProfileMenuItem( getString(R.string.title_section4), "ic_like", 15, 2));
+        mDrawerItems.add(new ProfileMenuItem( getString(R.string.title_section5), "ic_chat", 7, 2));
+        mDrawerItems.add(new ProfileMenuItem( "Logout", "logout", 1, 1));
 
         ProfileDrawerAdapter adapter = new ProfileDrawerAdapter(getListView().getContext());
         adapter.updateItems(mDrawerItems);
@@ -201,7 +222,7 @@ public class NavigationDrawerFragment extends ListFragment {
                     mUserLearnedDrawer = true;
                     SharedPreferences sp = PreferenceManager
                             .getDefaultSharedPreferences(getActivity());
-                    sp.edit().putBoolean(PREF_USER_LEARNED_DRAWER, true).commit(); // use .apply() in newer sdk's
+                    sp.edit().putBoolean(PREF_USER_LEARNED_DRAWER, true).apply();
                 }
 
                 getActivity().supportInvalidateOptionsMenu(); // calls onPrepareOptionsMenu()

@@ -9,4 +9,13 @@
     <TextView android:id="@+id/section_label" android:layout_width="wrap_content"
         android:layout_height="wrap_content" android:text="test" />
 
+    <ImageView
+        android:id="@+id/user_profile_img"
+        android:layout_width="@dimen/user_profile_img_size"
+        android:layout_height="@dimen/user_profile_img_size"
+        android:layout_below="@+id/section_label"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/user_profile_img_margin_top"
+        android:layout_marginBottom="@dimen/user_profile_img_margin_bottom" />
+
 </RelativeLayout>

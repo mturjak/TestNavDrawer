@@ -153,6 +153,8 @@ public class MainActivity extends ActionBarActivity
      * A placeholder fragment containing a simple view.
      */
     public static class PlaceholderFragment extends Fragment {
+
+        ParseUser mCurrentUser;
         /**
          * The fragment argument representing the section number for this
          * fragment.
@@ -187,6 +189,7 @@ public class MainActivity extends ActionBarActivity
             ((MainActivity) activity).onSectionAttached(
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
+
     }
 
 }

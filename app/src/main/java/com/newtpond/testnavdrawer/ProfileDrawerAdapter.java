@@ -2,7 +2,6 @@ package com.newtpond.testnavdrawer;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,15 +55,7 @@ final class ProfileDrawerAdapter extends BaseAdapter {
     // TODO: this is just set to accomodate teh dummy list ... acjust for real data
     @Override
     public int getItemViewType(int position) {
-        String itemName = mItems.get(position).getItemName();
-        switch(itemName) {
-            case "martin.turjak@gmail.com":
-                return 0;
-            case "logout":
-                return 1;
-            default:
-                return 2;
-        }
+        return mItems.get(position).getItemType();
     }
 
     @Override
@@ -89,20 +80,14 @@ final class ProfileDrawerAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         ProfileMenuItem item = getItem(position);
-        String itemText = item.getItemValue();
+        String itemText = item.getItemName();
         itemText = itemText.toUpperCase();
-        String itemName = item.getItemName();
+        String itemValue = item.getItemValue();
         int type = getItemViewType(position);
 
         if(type == 0) {
             if (convertView == null)
                 convertView = mLayoutInflater.inflate(R.layout.profile_drawer_head, null);
-
-            String gravatarUrl = Gravatar.init()
-                    .with(item.getEmail())
-                    .force404()
-                    .size(mAvatarImageViewPixelSize)
-                    .build();
 
             Transformation transformation = new RoundedTransformationBuilder()
                     .cornerRadiusDp(mAvatarImageViewPixelSize/2)
@@ -110,9 +95,10 @@ final class ProfileDrawerAdapter extends BaseAdapter {
                     .build();
 
             Picasso.with(mContext)
-                    .load(gravatarUrl)
+                    .load(itemValue)
                     .placeholder(R.drawable.ic_contact_picture)
                     .error(R.drawable.ic_contact_picture)
+                    .resize(mAvatarImageViewPixelSize, mAvatarImageViewPixelSize)
                     .transform(transformation)
                     .into((ImageView) convertView.findViewById(R.id.user_profile_img));
 
@@ -125,7 +111,7 @@ final class ProfileDrawerAdapter extends BaseAdapter {
                 if (convertView == null)
                     convertView = mLayoutInflater.inflate(R.layout.profile_drawer_item, null);
 
-                int drawableResourceId = mContext.getResources().getIdentifier(itemName, "drawable", mContext.getPackageName());
+                int drawableResourceId = mContext.getResources().getIdentifier(itemValue, "drawable", mContext.getPackageName());
 
                 ImageView icon = (ImageView) convertView.findViewById(R.id.drawer_item_logo);
 

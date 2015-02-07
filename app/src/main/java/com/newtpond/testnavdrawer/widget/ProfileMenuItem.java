@@ -6,24 +6,19 @@ package com.newtpond.testnavdrawer.widget;
 public class ProfileMenuItem {
     private String mItemName;
     private String mItemValue;
-    private String mItemType;
-    private String mItemEmail;
+    private int mItemType;
     private int mItemNum = 0;
 
-    public ProfileMenuItem(String itemName, String itemValue, int itemNum) {
+    public ProfileMenuItem(String itemName, String itemValue, int itemNum, int type) {
         mItemName = itemName;
         mItemValue = itemValue;
         mItemNum = itemNum;
-        mItemType = "item";
-        mItemEmail = itemName;
+        mItemType = type;
+
     }
 
     public int getItemNum() {
         return mItemNum;
-    }
-
-    public String getEmail() {
-        return mItemEmail;
     }
 
     public String getItemName() {
@@ -34,11 +29,11 @@ public class ProfileMenuItem {
         return mItemValue;
     }
 
-    public void setItemType(String type) {
+    public void setItemType(int type) {
         mItemType = type;
     }
 
-    public String getItemType() {
+    public int getItemType() {
         return mItemType;
     }
 }
