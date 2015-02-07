@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,11 +33,14 @@ public class LoginActivity extends Activity {
     protected EditText mPassword;
     protected Button mLoginButton;
     protected Button mFbLoginButton;
+    protected ProgressBar mAuthProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        mAuthProgress = (ProgressBar)findViewById(R.id.progressIndicator);
 
         /* TODO: use this to generate hash for facebook app
         // - has to be run after package generated again as the hash changes ... and then deleted so it does not log
@@ -149,11 +153,14 @@ public class LoginActivity extends Activity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        mAuthProgress.setVisibility(View.INVISIBLE);
         ParseFacebookUtils.finishAuthentication(requestCode, resultCode, data);
     }
 
     private void onFbLoginButtonClicked() {
+        mAuthProgress.setVisibility(View.VISIBLE);
         List<String> permissions = Arrays.asList("public_profile");
+
         ParseFacebookUtils.logIn(permissions, this, new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException err) {

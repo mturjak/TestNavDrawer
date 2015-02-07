@@ -125,7 +125,8 @@
             style="@android:style/Widget.ProgressBar.Small"
             android:layout_centerVertical="true"
             android:layout_marginLeft="18dp"
-            android:layout_marginStart="18dp"/>
+            android:layout_marginStart="18dp"
+            android:visibility="invisible" />
 
     </RelativeLayout>
 
