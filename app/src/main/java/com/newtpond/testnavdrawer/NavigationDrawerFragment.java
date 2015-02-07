@@ -65,11 +65,13 @@ public class NavigationDrawerFragment extends ListFragment {
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
-    private String mAvatarUrl;
 
     private boolean mIsDrawerLocked;
 
+    // user profile
     private ParseUser mCurrentUser;
+    private String mAvatarUrl;
+    private String mUserDisplayName;
 
     public NavigationDrawerFragment() {
     }
@@ -89,7 +91,24 @@ public class NavigationDrawerFragment extends ListFragment {
                         .size(getResources().getDimensionPixelSize(R.dimen.user_profile_img_size))
                         .build();
             } else {
+                // if has facebookId get facebook avatar
                 mAvatarUrl = "https://graph.facebook.com/" + mCurrentUser.get("facebookId").toString() + "/picture?type=large";
+            }
+
+            // try getting user name to display
+            if(mCurrentUser.get("displayName") != null) {
+                // try getting whole displayName
+                mUserDisplayName = mCurrentUser.get("displayName").toString();
+            } else if(mCurrentUser.get("firstName") != null) {
+                // try getting firstName
+                mUserDisplayName = mCurrentUser.get("firstName").toString();
+                if(mCurrentUser.get("lastName") != null) {
+                    // try adding lastName
+                    mUserDisplayName = mUserDisplayName + " " + mCurrentUser.get("lastName").toString();
+                }
+            } else {
+                // if nothing else worked show username
+                mUserDisplayName = mCurrentUser.getUsername();
             }
         }
 
@@ -147,8 +166,8 @@ public class NavigationDrawerFragment extends ListFragment {
 
         mDrawerItems = new ArrayList<ProfileMenuItem>();
 
-        // TODO: load data from server
-        mDrawerItems.add(new ProfileMenuItem( mCurrentUser.get("displayName").toString(), mAvatarUrl, 0, 0));
+        // TODO: load data from server ------ DisplayName ----- Value -- Num - Type
+        mDrawerItems.add(new ProfileMenuItem( mUserDisplayName, mAvatarUrl, 0, 0));
         mDrawerItems.add(new ProfileMenuItem( getString(R.string.title_section1), "ic_grab",2, 2));
         mDrawerItems.add(new ProfileMenuItem( getString(R.string.title_section2), "ic_share", 15, 2));
         mDrawerItems.add(new ProfileMenuItem( getString(R.string.title_section3), "ic_friends", 7, 2));
