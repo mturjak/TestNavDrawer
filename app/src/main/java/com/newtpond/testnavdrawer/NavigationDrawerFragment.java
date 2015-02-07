@@ -70,8 +70,9 @@ public class NavigationDrawerFragment extends ListFragment {
 
     // user profile
     private ParseUser mCurrentUser;
-    private String mAvatarUrl;
-    private String mUserDisplayName;
+    // some methods will crash if no input so we initialize with some default strings that get passed around if not logged in
+    private String mAvatarUrl = "nouser";
+    private String mUserDisplayName = "nouser";
 
     public NavigationDrawerFragment() {
     }
