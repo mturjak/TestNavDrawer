@@ -153,7 +153,6 @@ public class LoginActivity extends Activity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mAuthProgress.setVisibility(View.INVISIBLE);
         ParseFacebookUtils.finishAuthentication(requestCode, resultCode, data);
     }
 
@@ -211,6 +210,7 @@ public class LoginActivity extends Activity {
                                             Toast.LENGTH_LONG).show();
                                 }
                             }
+                            mAuthProgress.setVisibility(View.INVISIBLE);
                         }
                     });
             request.executeAsync();
