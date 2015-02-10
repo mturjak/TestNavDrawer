@@ -18,7 +18,8 @@ import android.view.ViewGroup;
 
 import com.parse.ParseUser;
 
-import static com.newtpond.testnavdrawer.utils.NetworkAvailable.isNetworkAvailableAlert;
+import static com.newtpond.testnavdrawer.utils.NetworkAvailable.isNetworkAvailable;
+import static com.newtpond.testnavdrawer.utils.NetworkAvailable.noNetworkAlert;
 
 
 public class MainActivity extends ActionBarActivity
@@ -47,7 +48,9 @@ public class MainActivity extends ActionBarActivity
             // Log.i(TAG, currentUser.getUsername());
 
             // check if network available
-            isNetworkAvailableAlert(this);
+            if(!isNetworkAvailable(this)) {
+                noNetworkAlert(this);
+            }
         } else {
             navigateTo(LoginActivity.class, true);
         }

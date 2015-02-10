@@ -26,7 +26,8 @@ import com.parse.ParseUser;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.newtpond.testnavdrawer.utils.NetworkAvailable.isNetworkAvailableAlert;
+import static com.newtpond.testnavdrawer.utils.NetworkAvailable.isNetworkAvailable;
+import static com.newtpond.testnavdrawer.utils.NetworkAvailable.noNetworkAlert;
 
 public class LoginActivity extends Activity {
 
@@ -114,7 +115,9 @@ public class LoginActivity extends Activity {
                                 // start main activity
                                 finishActivity();
                             } else {
-                                if(isNetworkAvailableAlert(LoginActivity.this)) {
+                                if(!isNetworkAvailable(LoginActivity.this)) {
+                                    noNetworkAlert(LoginActivity.this);
+                                } else {
                                     AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                                     builder.setMessage(e.getMessage())
                                             .setTitle(R.string.login_error_title)
@@ -164,7 +167,8 @@ public class LoginActivity extends Activity {
         mAuthProgress.setVisibility(View.VISIBLE);
         List<String> permissions = Arrays.asList("public_profile");
 
-        if(!isNetworkAvailableAlert(this)) {
+        if(!isNetworkAvailable(LoginActivity.this)) {
+            noNetworkAlert(this);
             mAuthProgress.setVisibility(View.INVISIBLE);
         } else {
             ParseFacebookUtils.logIn(permissions, this, new LogInCallback() {

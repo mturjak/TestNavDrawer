@@ -2,8 +2,11 @@ package com.newtpond.testnavdrawer.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.IBinder;
+import android.app.Service;
 
 import com.newtpond.testnavdrawer.R;
 
@@ -29,16 +32,12 @@ public final class NetworkAvailable {
     /**
      * Open dialog if network not available
      */
-    public static boolean isNetworkAvailableAlert(Context c) {
-        if (!isNetworkAvailable(c)) {
+    public static void noNetworkAlert(Context c) {
             AlertDialog.Builder builder = new AlertDialog.Builder(c);
             builder.setMessage(R.string.network_not_available)
                     .setTitle(R.string.network_error_title)
                     .setPositiveButton(android.R.string.ok, null);
             AlertDialog dialog = builder.create();
             dialog.show();
-            return false;
-        }
-        return false;
     }
 }
