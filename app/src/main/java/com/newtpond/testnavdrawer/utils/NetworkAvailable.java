@@ -2,11 +2,8 @@ package com.newtpond.testnavdrawer.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.IBinder;
-import android.app.Service;
 
 import com.newtpond.testnavdrawer.R;
 
