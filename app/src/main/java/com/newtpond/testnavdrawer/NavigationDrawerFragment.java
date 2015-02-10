@@ -1,8 +1,10 @@
 package com.newtpond.testnavdrawer;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -326,8 +328,14 @@ public class NavigationDrawerFragment extends ListFragment {
         }
 
         if (item.getItemId() == R.id.action_example) {
-            Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
-            return true;
+            if(getActionBar().getTitle() == getString(R.string.title_section1)) {
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                        Uri.parse("http://maps.google.com/maps?daddr=51.539337,9.938624"));
+                startActivity(intent);
+            } else {
+                Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
+                return true;
+            }
         }
 
         return super.onOptionsItemSelected(item);
