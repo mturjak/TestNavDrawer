@@ -26,6 +26,8 @@ import com.parse.ParseUser;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.newtpond.testnavdrawer.utils.NetworkAvailable.isNetworkAvailableAlert;
+
 public class LoginActivity extends Activity {
 
     protected TextView mSignUpTextView;
@@ -112,12 +114,14 @@ public class LoginActivity extends Activity {
                                 // start main activity
                                 finishActivity();
                             } else {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                                builder.setMessage(e.getMessage())
-                                        .setTitle(R.string.login_error_title)
-                                        .setPositiveButton(android.R.string.ok, null);
-                                AlertDialog dialog = builder.create();
-                                dialog.show();
+                                if(isNetworkAvailableAlert(LoginActivity.this)) {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                                    builder.setMessage(e.getMessage())
+                                            .setTitle(R.string.login_error_title)
+                                            .setPositiveButton(android.R.string.ok, null);
+                                    AlertDialog dialog = builder.create();
+                                    dialog.show();
+                                }
                             }
                         }
                     });
@@ -160,19 +164,23 @@ public class LoginActivity extends Activity {
         mAuthProgress.setVisibility(View.VISIBLE);
         List<String> permissions = Arrays.asList("public_profile");
 
-        ParseFacebookUtils.logIn(permissions, this, new LogInCallback() {
-            @Override
-            public void done(ParseUser user, ParseException err) {
-                if (user != null) {
-                    if (user.isNew()) {
-                        // set favorites as null, or mark it as empty somehow
-                        makeMeRequest();
-                    } else {
-                        finishActivity();
+        if(!isNetworkAvailableAlert(this)) {
+            mAuthProgress.setVisibility(View.INVISIBLE);
+        } else {
+            ParseFacebookUtils.logIn(permissions, this, new LogInCallback() {
+                @Override
+                public void done(ParseUser user, ParseException err) {
+                    if (user != null) {
+                        if (user.isNew()) {
+                            // set favorites as null, or mark it as empty somehow
+                            makeMeRequest();
+                        } else {
+                            finishActivity();
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
     }
 
     private void makeMeRequest() {

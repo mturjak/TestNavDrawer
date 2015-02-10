@@ -2,10 +2,7 @@ package com.newtpond.testnavdrawer;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,9 +15,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.parse.ParseUser;
+
+import static com.newtpond.testnavdrawer.utils.NetworkAvailable.isNetworkAvailableAlert;
 
 
 public class MainActivity extends ActionBarActivity
@@ -43,17 +41,13 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // check if network available
-        if(!isNetworkAvailable()) {
-            Toast.makeText(getApplicationContext(),
-                    R.string.network_not_available,
-                    Toast.LENGTH_LONG).show();
-        }
-
         ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser != null) {
             // do stuff with the user
             // Log.i(TAG, currentUser.getUsername());
+
+            // check if network available
+            isNetworkAvailableAlert(this);
         } else {
             navigateTo(LoginActivity.class, true);
         }
@@ -158,21 +152,6 @@ public class MainActivity extends ActionBarActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Check if network available
-     */
-    private boolean isNetworkAvailable() {
-        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
-
-        boolean isAvailable = false;
-        if(networkInfo != null && networkInfo.isConnected()) {
-            isAvailable = true;
-        }
-
-        return isAvailable;
     }
 
     /**

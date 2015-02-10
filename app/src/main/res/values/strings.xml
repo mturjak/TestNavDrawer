@@ -24,5 +24,6 @@
     <string name="session_invalid_error">Your current session is no longer valid. Please log in again.</string>
     <string name="logn_generic_error">Something went wrong. Please retry.</string>
     <string name="network_not_available">No network connection available.</string>
+    <string name="network_error_title">Network error</string>
 
 </resources>
