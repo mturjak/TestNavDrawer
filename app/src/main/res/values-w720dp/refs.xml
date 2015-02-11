@@ -1,0 +1,3 @@
+<resources>
+    <item type="layout" name="fragment_main_list">@layout/fragment_main_twopane</item>
+</resources>

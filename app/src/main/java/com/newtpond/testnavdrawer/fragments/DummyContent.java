@@ -1,4 +1,4 @@
-package com.newtpond.testnavdrawer.dummy;
+package com.newtpond.testnavdrawer.fragments;
 
 import java.util.ArrayList;
 import java.util.HashMap;

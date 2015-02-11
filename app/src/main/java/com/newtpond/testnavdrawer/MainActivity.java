@@ -13,8 +13,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.newtpond.testnavdrawer.dummy.MainFragment;
-import com.newtpond.testnavdrawer.dummy.PlaceholderFragment;
+import com.newtpond.testnavdrawer.fragments.MainFragment;
+import com.newtpond.testnavdrawer.fragments.UsersListFragment;
 import com.parse.ParseUser;
 
 import static com.newtpond.testnavdrawer.utils.NetworkAvailable.isNetworkAvailable;
@@ -101,7 +101,7 @@ public class MainActivity extends ActionBarActivity
         if(position == 1) {
             fragment = new MainFragment(); // TODO: better not to instantiate every time
         } else {
-            fragment = new PlaceholderFragment(); // TODO: better not to instantiate every time
+            fragment = new UsersListFragment(); // TODO: better not to instantiate every time
         }
         return fragment;
     }

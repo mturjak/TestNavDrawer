@@ -1,4 +1,4 @@
-package com.newtpond.testnavdrawer.dummy;
+package com.newtpond.testnavdrawer.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -15,7 +15,7 @@ import com.parse.ParseUser;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PlaceholderFragment extends Fragment {
+public class UsersListFragment extends Fragment {
 
     ParseUser mCurrentUser;
 
@@ -37,15 +37,15 @@ public class PlaceholderFragment extends Fragment {
         return fragment;
     }*/
 
-    public PlaceholderFragment() {
+    public UsersListFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_users, container, false);
 
-        ((TextView) rootView.findViewById(R.id.section_label)).setText("haha " + getArguments().getInt(ARG_SECTION_NUMBER));
+        ((TextView) rootView.findViewById(R.id.section_label)).setText("users " + getArguments().getInt(ARG_SECTION_NUMBER));
 
         return rootView;
     }
