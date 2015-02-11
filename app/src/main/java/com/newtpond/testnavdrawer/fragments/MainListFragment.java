@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 /**
@@ -71,11 +70,9 @@ public class MainListFragment extends ListFragment {
         Log.e("MainListFragment", "onCreate");
 
         // TODO: replace with a real list adapter.
-        setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(
-                getActivity(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                DummyContent.ITEMS));
+        GrabListAdapter adapter = new GrabListAdapter<DummyContent.DummyItem>(getActivity());
+        adapter.updateItems(DummyContent.ITEMS);
+        setListAdapter(adapter);
     }
 
     @Override

@@ -6,7 +6,7 @@
     android:showDividers="middle" tools:context=".MainActivity">
 
     <ListView android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:layout_height="match_parent"
         android:id="@android:id/list"
         android:choiceMode="singleChoice"
@@ -15,6 +15,6 @@
         android:listSelector="@drawable/list_selector" />
 
     <FrameLayout android:id="@+id/blogpost_detail_container" android:layout_width="0dp"
-        android:layout_height="match_parent" android:layout_weight="3" />
+        android:layout_height="match_parent" android:layout_weight="2" />
 
 </LinearLayout>

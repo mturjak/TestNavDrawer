@@ -40,11 +40,9 @@ public class MainFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_main_list, container, false);
 
         ListView mainList = (ListView)rootView.findViewById(android.R.id.list);
-        mainList.setAdapter(new ArrayAdapter<DummyContent.DummyItem>(
-                getActivity(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                DummyContent.ITEMS));
+        GrabListAdapter adapter = new GrabListAdapter<DummyContent.DummyItem>(getActivity());
+        adapter.updateItems(DummyContent.ITEMS);
+        mainList.setAdapter(adapter);
 
         mainList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

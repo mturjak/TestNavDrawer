@@ -27,4 +27,9 @@
     <dimen name="login_field_ico_size">18dp</dimen>
     <dimen name="login_field_padding_left">34dp</dimen>
     <bool name="login_portrait_only">true</bool>
+
+    <!-- grab list -->
+    <dimen name="grab_item_size">68dp</dimen>
+    <dimen name="grab_item_padding_bottom">8dp</dimen>
+
 </resources>
