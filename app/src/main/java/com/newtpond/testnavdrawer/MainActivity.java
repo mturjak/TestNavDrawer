@@ -10,9 +10,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.newtpond.testnavdrawer.fragments.BlogPostDetailActivity;
+import com.newtpond.testnavdrawer.fragments.EditUserActivity;
+import com.newtpond.testnavdrawer.fragments.EditUserFragment;
 import com.newtpond.testnavdrawer.fragments.MainFragment;
 import com.newtpond.testnavdrawer.fragments.UsersListFragment;
 import com.parse.ParseUser;
@@ -195,6 +200,33 @@ public class MainActivity extends ActionBarActivity
             return true;
         }
 
+        //noinspection SimplifiableIfStatement
+        if (!mNavigationDrawerFragment.isDrawerOpen() && !mIsDrawerLocked && id == R.id.home) {
+            onBackPressed();
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(!mNavigationDrawerFragment.isDrawerOpen() && !mIsDrawerLocked) {
+            DrawerLayout drawer = (DrawerLayout) MainActivity.this.findViewById(R.id.drawer_layout);
+            drawer.openDrawer(Gravity.START);
+        } else {
+            MainActivity.super.onBackPressed();
+        }
+    }
+
+    public void editUser() {
+        if(mIsDrawerLocked) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, new EditUserFragment()) // TODO: use instance instead of instantiating again
+                    .commit();
+        } else {
+            navigateTo(EditUserActivity.class, false);
+        }
     }
 }

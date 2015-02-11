@@ -33,6 +33,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.newtpond.testnavdrawer.MainActivity" />
         </activity>
+        <activity
+            android:name=".fragments.EditUserActivity"
+            android:label="@string/title_activity_edituser"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.newtpond.testnavdrawer.MainActivity" />
+        </activity>
 
         <!-- Facebook Integration -->
         <activity

@@ -178,11 +178,11 @@ public class NavigationDrawerFragment extends ListFragment {
         mDrawerItems.add(new ProfileMenuItem( getString(R.string.title_section5), "ic_chat", 7, 2));
         mDrawerItems.add(new ProfileMenuItem( "Logout", "logout", 1, 1));
 
-        ProfileDrawerAdapter adapter = new ProfileDrawerAdapter(getListView().getContext());
+        mDrawerListView = getListView();
+
+        ProfileDrawerAdapter adapter = new ProfileDrawerAdapter(mDrawerListView.getContext());
         adapter.updateItems(mDrawerItems);
         setListAdapter(adapter);
-
-        mDrawerListView = getListView();
 
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

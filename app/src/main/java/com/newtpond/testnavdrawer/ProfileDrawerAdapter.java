@@ -17,8 +17,6 @@ import com.squareup.picasso.Transformation;
 import java.util.Collections;
 import java.util.List;
 
-import fr.tkeunebr.gravatar.Gravatar;
-
 /**
  * ProfileDrawerAdapter helps us construct the side drawer profile list
  */
@@ -101,6 +99,15 @@ final class ProfileDrawerAdapter extends BaseAdapter {
                     .resize(mAvatarImageViewPixelSize, mAvatarImageViewPixelSize)
                     .transform(transformation)
                     .into((ImageView) convertView.findViewById(R.id.user_profile_img));
+
+            convertView.findViewById(R.id.drawer_profile_edit).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mContext instanceof MainActivity){
+                        ((MainActivity)mContext).editUser();
+                    }
+                }
+            });
 
         } else {
             if (type == 1) {
