@@ -1,6 +1,15 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:id="@+id/blogpost_list"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:layout_marginLeft="16dp" android:layout_marginRight="16dp"
-    tools:context=".BlogPostListActivity" tools:layout="@android:layout/list_content"
-    android:name="com.newtpond.testnavdrawer.fragments.MainListFragment" />
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context="com.newtpond.testnavdrawer.fragments.MainFragment"
+android:layout_gravity="start" >
+
+<ListView android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@android:id/list"
+    android:choiceMode="singleChoice"
+    android:divider="@android:color/transparent"
+    android:dividerHeight="0dp"
+    android:listSelector="@drawable/list_selector" />
+
+</RelativeLayout>

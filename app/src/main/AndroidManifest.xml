@@ -25,6 +25,14 @@
             android:name=".LoginActivity"
             android:label="@string/title_activity_login" >
         </activity>
+        <activity
+            android:name=".fragments.BlogPostDetailActivity"
+            android:label="@string/title_activity_blogpostdetail"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.newtpond.testnavdrawer.MainActivity" />
+        </activity>
 
         <!-- Facebook Integration -->
         <activity

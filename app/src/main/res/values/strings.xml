@@ -25,5 +25,6 @@
     <string name="logn_generic_error">Something went wrong. Please retry.</string>
     <string name="network_not_available">No network connection available.</string>
     <string name="network_error_title">Network error</string>
+    <string name="title_activity_blogpostdetail">BlogPostDetailActivity</string>
 
 </resources>

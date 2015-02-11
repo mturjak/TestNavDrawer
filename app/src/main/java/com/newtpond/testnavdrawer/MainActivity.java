@@ -36,6 +36,14 @@ public class MainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
 
+
+    /**
+     * Section fragments
+     */
+    private int mCurrentSection = -1;
+    private Fragment mMainFragment;
+    private Fragment mUsersFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,26 +90,43 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        // update the main content by replacing fragments
-        Fragment fragment = getFragment(position);
+        if(mCurrentSection == -1 || position != mCurrentSection) {
+            mCurrentSection = position;
+            // update the main content by replacing fragments
+            Fragment fragment = getFragment(position);
 
-        // add position as argument
-        Bundle arguments = new Bundle();
-        arguments.putInt(MainFragment.ARG_SECTION_NUMBER, position);
-        fragment.setArguments(arguments);
+            // add position as argument
+            Bundle arguments = new Bundle();
+            arguments.putInt(MainFragment.ARG_SECTION_NUMBER, position);
+            fragment.setArguments(arguments);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, fragment)
-                .commit();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, fragment)
+                    .commit();
+        }
     }
 
     private Fragment getFragment(int position) {
         Fragment fragment;
         if(position == 1) {
-            fragment = new MainFragment(); // TODO: better not to instantiate every time
+
+            if(mMainFragment != null) {
+                return mMainFragment;
+            } else {
+                fragment = new MainFragment();
+                mMainFragment = fragment;
+            }
+
         } else {
-            fragment = new UsersListFragment(); // TODO: better not to instantiate every time
+
+            /*if(mUsersFragment != null) {
+                return mUsersFragment;
+            } else {*/
+                fragment = new UsersListFragment(); // TODO: better not to instantiate every time
+            /*    mUsersFragment = fragment;
+            }*/
+
         }
         return fragment;
     }

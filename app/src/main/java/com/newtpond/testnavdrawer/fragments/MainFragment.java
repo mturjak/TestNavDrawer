@@ -1,11 +1,16 @@
 package com.newtpond.testnavdrawer.fragments;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.newtpond.testnavdrawer.MainActivity;
 import com.newtpond.testnavdrawer.R;
@@ -32,7 +37,37 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_main_list, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_main_list, container, false);
+
+        ListView mainList = (ListView)rootView.findViewById(android.R.id.list);
+        mainList.setAdapter(new ArrayAdapter<DummyContent.DummyItem>(
+                getActivity(),
+                android.R.layout.simple_list_item_activated_1,
+                android.R.id.text1,
+                DummyContent.ITEMS));
+
+        mainList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                if(mTwoPane) {
+                    Fragment fragment = getFragment(position);
+
+                    // add position as argument
+                    Bundle arguments = new Bundle();
+                    arguments.putInt(MainFragment.ARG_SECTION_NUMBER, position);
+                    fragment.setArguments(arguments);
+
+                    FragmentManager fragmentManager = getChildFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.blogpost_detail_container, fragment)
+                            .commit();
+                } else {
+                    Intent detailIntent = new Intent(parent.getContext(), BlogPostDetailActivity.class);
+                    detailIntent.putExtra(MainDetailFragment.ARG_ITEM_ID, position);
+                    startActivity(detailIntent);
+                }
+            }
+        });
 
         if (rootView.findViewById(R.id.blogpost_detail_container) != null) {
             // The detail container view will be present only in the
@@ -43,12 +78,20 @@ public class MainFragment extends Fragment {
 
             // In two-pane mode, list items should be given the
             // 'activated' state when touched.
-            ((MainListFragment) getChildFragmentManager()
+           /*((MainListFragment) getChildFragmentManager()
                     .findFragmentById(R.id.blogpost_list))
-                    .setActivateOnItemClick(true);
+                    .setActivateOnItemClick(true);*/
         }
 
         return rootView;
+    }
+
+    private Fragment getFragment(int position) {
+        Fragment fragment;
+
+        fragment = new MainDetailFragment(); // TODO: better not to instantiate every time
+
+        return fragment;
     }
 
     @Override
@@ -59,8 +102,7 @@ public class MainFragment extends Fragment {
     }
 
     /*
-    @Override
-    public void onItemClick() {
+    public void onItemSelected(String id) {
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
@@ -76,7 +118,7 @@ public class MainFragment extends Fragment {
         } else {
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
-            Intent detailIntent = new Intent(, BlogPostDetailActivity.class);
+            Intent detailIntent = new Intent(this, BlogPostDetailActivity.class);
             detailIntent.putExtra(MainDetailFragment.ARG_ITEM_ID, id);
             startActivity(detailIntent);
         }

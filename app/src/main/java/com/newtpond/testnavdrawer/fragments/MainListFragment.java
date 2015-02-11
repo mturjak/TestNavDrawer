@@ -22,7 +22,7 @@ public class MainListFragment extends ListFragment {
      * The serialization (saved instance state) Bundle key representing the
      * activated item position. Only used on tablets.
      */
-    private static final String STATE_ACTIVATED_POSITION = "activated_position";
+    private static final String STATE_ACTIVATED_POSITION = "main_activated_position";
 
     /**
      * The fragment's current callback object, which is notified of list item
