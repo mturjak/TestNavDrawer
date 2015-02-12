@@ -14,6 +14,9 @@ import android.widget.ListView;
 import com.newtpond.testnavdrawer.MainActivity;
 import com.newtpond.testnavdrawer.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A list fragment representing a list of BlogPosts. This fragment
  * also supports tablet devices by allowing list items to be given an
@@ -39,8 +42,22 @@ public class MainFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_main_list, container, false);
 
         ListView mainList = (ListView)rootView.findViewById(android.R.id.list);
+
         GrabListAdapter adapter = new GrabListAdapter<DummyContent.DummyItem>(getActivity());
-        adapter.updateItems(DummyContent.ITEMS);
+
+        int section = ((MainActivity)getActivity()).getCurrentSection();
+
+        if(section != -1) {
+            List<DummyContent.DummyItem> filtered = new ArrayList<DummyContent.DummyItem>();
+            for (DummyContent.DummyItem item : DummyContent.ITEMS) {
+                if (item.getType() == section)
+                    filtered.add(item);
+            }
+            adapter.updateItems(filtered);
+        } else {
+            adapter.updateItems(DummyContent.ITEMS);
+        }
+
         mainList.setAdapter(adapter);
 
         mainList.setOnItemClickListener(new AdapterView.OnItemClickListener() {

@@ -240,4 +240,8 @@ public class MainActivity extends ActionBarActivity
             navigateTo(EditUserActivity.class, false);
         }
     }
+
+    public int getCurrentSection() {
+        return mCurrentSection;
+    }
 }
