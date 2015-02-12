@@ -18,14 +18,14 @@ import java.util.List;
 /**
  * GrabListAdapter displays items in the offers' list
  */
-final class GrabListAdapter<T> extends BaseAdapter implements Filterable {
+final class MainListAdapter<T> extends BaseAdapter implements Filterable {
 
     private final Context mContext;
     private final LayoutInflater mLayoutInflater;
     private List<T> mItems = Collections.emptyList();
     private int mAvatarImageViewPixelSize;
 
-    public GrabListAdapter(Context context) {
+    public MainListAdapter(Context context) {
         mContext = context;
         mAvatarImageViewPixelSize = context.getResources().getDimensionPixelSize(R.dimen.user_profile_img_size);
         mLayoutInflater = LayoutInflater.from(context);
@@ -117,7 +117,14 @@ final class GrabListAdapter<T> extends BaseAdapter implements Filterable {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         if (convertView == null) {
-            convertView = mLayoutInflater.inflate(R.layout.grab_list_item, null);
+            switch(getItemViewType(position)) {
+                case 1:
+                    convertView = mLayoutInflater.inflate(R.layout.grab_list_item, null);
+                    break;
+                default:
+                    convertView = mLayoutInflater.inflate(R.layout.moment_list_item, null);
+                    break;
+            }
         }
 
         if (position % 2 == 0) {

@@ -70,7 +70,7 @@ public class MainListFragment extends ListFragment {
         Log.e("MainListFragment", "onCreate");
 
         // TODO: replace with a real list adapter.
-        GrabListAdapter adapter = new GrabListAdapter<DummyContent.DummyItem>(getActivity());
+        MainListAdapter adapter = new MainListAdapter<DummyContent.DummyItem>(getActivity());
         adapter.updateItems(DummyContent.ITEMS);
         setListAdapter(adapter);
     }

@@ -43,7 +43,7 @@ public class MainFragment extends Fragment {
 
         ListView mainList = (ListView)rootView.findViewById(android.R.id.list);
 
-        GrabListAdapter adapter = new GrabListAdapter<DummyContent.DummyItem>(getActivity());
+        MainListAdapter adapter = new MainListAdapter<DummyContent.DummyItem>(getActivity());
 
         int section = ((MainActivity)getActivity()).getCurrentSection();
 
