@@ -47,7 +47,7 @@ public class MainFragment extends Fragment {
 
         int section = ((MainActivity)getActivity()).getCurrentSection();
 
-        if(section != -1) {
+        if(section > 0) {
             List<DummyContent.DummyItem> filtered = new ArrayList<DummyContent.DummyItem>();
             for (DummyContent.DummyItem item : DummyContent.ITEMS) {
                 if (item.getType() == section)

@@ -18,7 +18,6 @@ import android.widget.ListView;
 import com.newtpond.testnavdrawer.fragments.EditUserActivity;
 import com.newtpond.testnavdrawer.fragments.EditUserFragment;
 import com.newtpond.testnavdrawer.fragments.MainFragment;
-import com.newtpond.testnavdrawer.fragments.MomentFragment;
 import com.newtpond.testnavdrawer.fragments.UsersListFragment;
 import com.parse.ParseUser;
 
@@ -48,6 +47,7 @@ public class MainActivity extends ActionBarActivity
      */
     private int mCurrentSection = -1;
     private Fragment mMainFragment;
+    private Fragment mGrabFragment;
     private Fragment mMomentFragment;
 
     @Override
@@ -101,7 +101,7 @@ public class MainActivity extends ActionBarActivity
         if(mCurrentSection == -1 || position != mCurrentSection) {
             mCurrentSection = position;
             // update the main content by replacing fragments
-            Fragment fragment = getFragment(position);
+            Fragment fragment = getFragment();
 
             // add position as argument
             Bundle arguments = new Bundle();
@@ -115,15 +115,27 @@ public class MainActivity extends ActionBarActivity
         }
     }
 
-    private Fragment getFragment(int position) {
+    /**
+     * getFragment
+     * @return Fragment based on current section
+     */
+    private Fragment getFragment() { // TODO: make more DRY
         Fragment fragment;
-        switch (position) {
-            case 1:
+        switch (mCurrentSection) {
+            case 0:
                 if(mMainFragment != null) {
                     return mMainFragment;
                 } else {
                     fragment = new MainFragment();
                     mMainFragment = fragment;
+                }
+                break;
+            case 1:
+                if(mGrabFragment != null) {
+                    return mGrabFragment;
+                } else {
+                    fragment = new MainFragment();
+                    mGrabFragment = fragment;
                 }
                 break;
             case 2:
@@ -227,7 +239,7 @@ public class MainActivity extends ActionBarActivity
         if(mIsDrawerLocked) {
 
             // clear drawer selection
-            mCurrentSection = -1;
+            mCurrentSection = 0;
             ListView drawerList = (ListView)mDrawerLayout.findViewById(android.R.id.list);
             drawerList.clearChoices();
             ((ProfileDrawerAdapter)drawerList.getAdapter()).notifyDataSetChanged();
