@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.newtpond.testnavdrawer.fragments.BlogPostDetailActivity;
@@ -30,6 +31,7 @@ public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     private boolean mIsDrawerLocked = false;
+    private DrawerLayout mDrawerLayout;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -76,10 +78,12 @@ public class MainActivity extends ActionBarActivity
         // so we can use it as a switch for locking the drawer
         mIsDrawerLocked = getResources().getDimensionPixelSize(R.dimen.drawer_content_padding) > 0;
 
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout),
+                mDrawerLayout,
                 mIsDrawerLocked);
     }
 
@@ -212,8 +216,7 @@ public class MainActivity extends ActionBarActivity
     @Override
     public void onBackPressed() {
         if(!mNavigationDrawerFragment.isDrawerOpen() && !mIsDrawerLocked) {
-            DrawerLayout drawer = (DrawerLayout) MainActivity.this.findViewById(R.id.drawer_layout);
-            drawer.openDrawer(Gravity.START);
+            mDrawerLayout.openDrawer(Gravity.START);
         } else {
             MainActivity.super.onBackPressed();
         }
@@ -221,6 +224,13 @@ public class MainActivity extends ActionBarActivity
 
     public void editUser() {
         if(mIsDrawerLocked) {
+
+            // clear drawer selection
+            mCurrentSection = -1;
+            ListView drawerList = (ListView)mDrawerLayout.findViewById(android.R.id.list);
+            drawerList.clearChoices();
+            ((ProfileDrawerAdapter)drawerList.getAdapter()).notifyDataSetChanged();
+
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.container, new EditUserFragment()) // TODO: use instance instead of instantiating again

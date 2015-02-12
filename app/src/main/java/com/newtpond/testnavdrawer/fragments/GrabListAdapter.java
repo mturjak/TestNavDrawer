@@ -67,11 +67,15 @@ final class GrabListAdapter<T> extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        if (convertView == null)
+        if (convertView == null) {
             convertView = mLayoutInflater.inflate(R.layout.grab_list_item, null);
+        }
 
-        if (position % 2 == 1)
+        if (position % 2 == 0) {
             convertView.setBackgroundColor(0x00ffffff);
+        } else {
+            convertView.setBackgroundColor(0x99ffffff);
+        }
 
         return convertView;
     }
