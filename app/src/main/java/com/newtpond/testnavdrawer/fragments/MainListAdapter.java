@@ -8,7 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 
-import com.newtpond.testnavdrawer.MainActivity;
 import com.newtpond.testnavdrawer.R;
 
 import java.util.ArrayList;
@@ -58,11 +57,12 @@ final class MainListAdapter<T> extends BaseAdapter implements Filterable {
         return 2;
     }
 
+    // this must return int from 0 to getViewTypeCount-1
     @Override
     public int getItemViewType(int position) {
         T item = mItems.get(position);
         if(item instanceof DummyContent.DummyItem){
-            return ((DummyContent.DummyItem)item).getType();
+            return ((DummyContent.DummyItem)item).getType() - 1;
         }
         return 0;
     }
@@ -116,8 +116,10 @@ final class MainListAdapter<T> extends BaseAdapter implements Filterable {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
+        int type = getItemViewType(position);
+
         if (convertView == null) {
-            switch(getItemViewType(position)) {
+            switch(type) {
                 case 1:
                     convertView = mLayoutInflater.inflate(R.layout.grab_list_item, null);
                     break;
