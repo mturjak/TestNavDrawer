@@ -130,7 +130,7 @@ public class MainActivity extends ActionBarActivity
                 if(mMomentFragment != null) {
                     return mMomentFragment;
                 } else {
-                    fragment = new MomentFragment();
+                    fragment = new MainFragment();
                     mMomentFragment = fragment;
                 }
                 break;
