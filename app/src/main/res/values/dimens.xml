@@ -32,4 +32,7 @@
     <dimen name="grab_item_size">68dp</dimen>
     <dimen name="grab_item_padding_bottom">8dp</dimen>
 
+    <!-- moment list -->
+    <dimen name="user_avatar_size">42dp</dimen>
+
 </resources>

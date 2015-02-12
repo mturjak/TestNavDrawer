@@ -17,11 +17,10 @@
         android:id="@+id/grab_item_logo"
         android:layout_width="@dimen/grab_item_size"
         android:layout_height="@dimen/grab_item_size"
-        app:riv_corner_radius="4dp"
+        app:riv_corner_radius="5dp"
         android:src="@drawable/dabuda"
         android:layout_marginRight="6dp"
-        android:layout_marginEnd="6dp"
-        android:background="@drawable/bg_item_ico" />
+        android:layout_marginEnd="6dp" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -86,7 +85,7 @@
             android:id="@+id/grab_user_1"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:src="@drawable/dabuda"
+            android:src="@drawable/ic_contact_picture"
             app:riv_corner_radius="28dp"
             android:layout_marginRight="3dp"
             android:layout_marginEnd="3dp"
@@ -97,7 +96,7 @@
             android:id="@+id/grab_user_2"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:src="@drawable/dabuda"
+            android:src="@drawable/ic_contact_picture"
             app:riv_corner_radius="28dp"
             android:layout_marginRight="6dp"
             android:layout_marginEnd="6dp"
@@ -107,7 +106,7 @@
             android:id="@+id/grab_user_3"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:src="@drawable/dabuda"
+            android:src="@drawable/ic_contact_picture"
             app:riv_corner_radius="28dp"
             android:layout_marginRight="6dp"
             android:layout_marginEnd="6dp"

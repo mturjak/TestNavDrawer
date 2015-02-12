@@ -23,13 +23,13 @@ import com.newtpond.testnavdrawer.R;
  * Activities containing this fragment MUST implement the {@link /Callbacks}
  * interface.
  */
-public class MainFragment extends Fragment {
+public class MomentFragment extends Fragment {
 
     public static final String ARG_SECTION_NUMBER = "section_id";
 
     private boolean mTwoPane = false;
 
-    public MainFragment() {
+    public MomentFragment() {
     }
 
     @Override
@@ -39,7 +39,7 @@ public class MainFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_main_list, container, false);
 
         ListView mainList = (ListView)rootView.findViewById(android.R.id.list);
-        GrabListAdapter adapter = new GrabListAdapter<DummyContent.DummyItem>(getActivity());
+        MomentListAdapter adapter = new MomentListAdapter<DummyContent.DummyItem>(getActivity());
         adapter.updateItems(DummyContent.ITEMS);
         mainList.setAdapter(adapter);
 
@@ -51,7 +51,7 @@ public class MainFragment extends Fragment {
 
                     // add position as argument
                     Bundle arguments = new Bundle();
-                    arguments.putInt(MainFragment.ARG_SECTION_NUMBER, position);
+                    arguments.putInt(MomentFragment.ARG_SECTION_NUMBER, position);
                     fragment.setArguments(arguments);
 
                     FragmentManager fragmentManager = getChildFragmentManager();

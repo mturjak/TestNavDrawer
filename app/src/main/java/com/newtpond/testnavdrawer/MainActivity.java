@@ -14,12 +14,11 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.newtpond.testnavdrawer.fragments.BlogPostDetailActivity;
 import com.newtpond.testnavdrawer.fragments.EditUserActivity;
 import com.newtpond.testnavdrawer.fragments.EditUserFragment;
 import com.newtpond.testnavdrawer.fragments.MainFragment;
+import com.newtpond.testnavdrawer.fragments.MomentFragment;
 import com.newtpond.testnavdrawer.fragments.UsersListFragment;
 import com.parse.ParseUser;
 
@@ -49,7 +48,7 @@ public class MainActivity extends ActionBarActivity
      */
     private int mCurrentSection = -1;
     private Fragment mMainFragment;
-    private Fragment mUsersFragment;
+    private Fragment mMomentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,24 +117,26 @@ public class MainActivity extends ActionBarActivity
 
     private Fragment getFragment(int position) {
         Fragment fragment;
-        if(position == 1) {
-
-            if(mMainFragment != null) {
-                return mMainFragment;
-            } else {
-                fragment = new MainFragment();
-                mMainFragment = fragment;
-            }
-
-        } else {
-
-            /*if(mUsersFragment != null) {
-                return mUsersFragment;
-            } else {*/
+        switch (position) {
+            case 1:
+                if(mMainFragment != null) {
+                    return mMainFragment;
+                } else {
+                    fragment = new MainFragment();
+                    mMainFragment = fragment;
+                }
+                break;
+            case 2:
+                if(mMomentFragment != null) {
+                    return mMomentFragment;
+                } else {
+                    fragment = new MomentFragment();
+                    mMomentFragment = fragment;
+                }
+                break;
+            default:
                 fragment = new UsersListFragment(); // TODO: better not to instantiate every time
-            /*    mUsersFragment = fragment;
-            }*/
-
+                break;
         }
         return fragment;
     }
