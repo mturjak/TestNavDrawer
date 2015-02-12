@@ -4,7 +4,7 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/drawer_item_padding"
+    android:paddingTop="@dimen/grab_item_padding_top"
     android:paddingBottom="@dimen/grab_item_padding_bottom"
     android:paddingRight="@dimen/drawer_item_padding_x"
     android:paddingEnd="@dimen/drawer_item_padding_x"
