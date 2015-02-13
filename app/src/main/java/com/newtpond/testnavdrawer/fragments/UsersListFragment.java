@@ -1,5 +1,6 @@
 package com.newtpond.testnavdrawer.fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.newtpond.testnavdrawer.MainActivity;
 import com.newtpond.testnavdrawer.R;
 import com.newtpond.testnavdrawer.utils.ParseConstants;
 import com.parse.FindCallback;
@@ -83,14 +85,12 @@ public class UsersListFragment extends ListFragment {
         });
     }
 
-    /*
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         ((MainActivity) activity).onSectionAttached(
                 getArguments().getInt(ARG_SECTION_NUMBER));
     }
-    */
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {

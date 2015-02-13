@@ -1,5 +1,6 @@
 package com.newtpond.testnavdrawer.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -97,11 +98,10 @@ public class MainFragment extends Fragment {
         return fragment;
     }
 
-    /*
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         ((MainActivity) activity).onSectionAttached(
                 getArguments().getInt(ARG_SECTION_NUMBER));
-    }*/
+    }
 }

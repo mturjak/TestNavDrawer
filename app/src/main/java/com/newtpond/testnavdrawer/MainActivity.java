@@ -19,6 +19,7 @@ import com.newtpond.testnavdrawer.fragments.EditUserActivity;
 import com.newtpond.testnavdrawer.fragments.EditUserFragment;
 import com.newtpond.testnavdrawer.fragments.MainDetailFragment;
 import com.newtpond.testnavdrawer.fragments.MainFragment;
+import com.newtpond.testnavdrawer.fragments.PlaceholderFragment;
 import com.newtpond.testnavdrawer.fragments.UsersListFragment;
 import com.parse.ParseUser;
 
@@ -157,7 +158,7 @@ public class MainActivity extends ActionBarActivity
                 }
                 break;
             default:
-                fragment = new MainDetailFragment(); // TODO: better not to instantiate every time
+                fragment = new PlaceholderFragment(); // TODO: better not to instantiate every time
                 break;
         }
         return fragment;
