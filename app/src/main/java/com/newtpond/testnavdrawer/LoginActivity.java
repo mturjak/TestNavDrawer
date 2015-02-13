@@ -29,6 +29,17 @@ import java.util.List;
 import static com.newtpond.testnavdrawer.utils.NetworkAvailable.isNetworkAvailable;
 import static com.newtpond.testnavdrawer.utils.NetworkAvailable.noNetworkAlert;
 
+/* these are for the app key hash
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
+import android.os.Bundle;
+import android.util.Base64;
+import android.util.Log;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+*/
+
 public class LoginActivity extends Activity {
 
     protected TextView mSignUpTextView;
@@ -45,9 +56,10 @@ public class LoginActivity extends Activity {
 
         mAuthProgress = (ProgressBar)findViewById(R.id.progressIndicator);
 
-        /* TODO: use this to generate hash for facebook app
+        /* TODO: use this to generate hash for facebook app*/
         // - has to be run after package generated again as the hash changes ... and then deleted so it does not log
         //
+        /*
         PackageInfo info;
         try {
             info = getPackageManager().getPackageInfo("com.newtpond.testnavdrawer", PackageManager.GET_SIGNATURES);

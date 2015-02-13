@@ -4,12 +4,18 @@ android:layout_height="match_parent"
 tools:context="com.newtpond.testnavdrawer.fragments.MainFragment"
 android:layout_gravity="start" >
 
-<ListView android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@android:id/list"
-    android:choiceMode="singleChoice"
-    android:divider="@android:color/transparent"
-    android:dividerHeight="0dp"
-    android:listSelector="@drawable/list_selector" />
+    <fragment
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.google.android.gms.maps.MapFragment"/>
+
+    <ListView android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@android:id/list"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:listSelector="@drawable/list_selector" />
 
 </RelativeLayout>
