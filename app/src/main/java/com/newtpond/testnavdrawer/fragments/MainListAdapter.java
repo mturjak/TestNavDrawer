@@ -120,7 +120,7 @@ final class MainListAdapter<T> extends BaseAdapter implements Filterable {
 
         if (convertView == null) {
             switch(type) {
-                case 1:
+                case 0:
                     convertView = mLayoutInflater.inflate(R.layout.grab_list_item, null);
                     break;
                 default:

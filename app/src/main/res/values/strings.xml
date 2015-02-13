@@ -28,5 +28,7 @@
     <string name="title_activity_blogpostdetail">BlogPostDetailActivity</string>
     <string name="title_activity_edituser">EditUserActivity</string>
     <string name="been_there_num">52 friends</string>
+    <string name="edit_friends_error_title">Sorry, something went wrong.</string>
+    <string name="empty_friends_label">Add friends to begin!</string>
 
 </resources>

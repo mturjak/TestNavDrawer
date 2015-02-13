@@ -17,6 +17,7 @@ import android.widget.ListView;
 
 import com.newtpond.testnavdrawer.fragments.EditUserActivity;
 import com.newtpond.testnavdrawer.fragments.EditUserFragment;
+import com.newtpond.testnavdrawer.fragments.MainDetailFragment;
 import com.newtpond.testnavdrawer.fragments.MainFragment;
 import com.newtpond.testnavdrawer.fragments.UsersListFragment;
 import com.parse.ParseUser;
@@ -49,6 +50,7 @@ public class MainActivity extends ActionBarActivity
     private Fragment mMainFragment;
     private Fragment mGrabFragment;
     private Fragment mMomentFragment;
+    private Fragment mFriendsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,8 +148,16 @@ public class MainActivity extends ActionBarActivity
                     mMomentFragment = fragment;
                 }
                 break;
+            case 3:
+                if(mFriendsFragment != null) {
+                    return mFriendsFragment;
+                } else {
+                    fragment = new UsersListFragment();
+                    mFriendsFragment = fragment;
+                }
+                break;
             default:
-                fragment = new UsersListFragment(); // TODO: better not to instantiate every time
+                fragment = new MainDetailFragment(); // TODO: better not to instantiate every time
                 break;
         }
         return fragment;

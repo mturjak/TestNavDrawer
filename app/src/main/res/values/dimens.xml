@@ -36,4 +36,11 @@
     <!-- moment list -->
     <dimen name="user_avatar_size">42dp</dimen>
 
+    <!-- user list -->
+    <dimen name="avatar_image_view_size">44dp</dimen>
+    <dimen name="avatar_border_radius">22dp</dimen>
+    <dimen name="avatar_margin_left">12dp</dimen>
+    <dimen name="contact_margin_left">28dp</dimen>
+
+
 </resources>

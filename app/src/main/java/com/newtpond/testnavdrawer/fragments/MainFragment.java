@@ -1,6 +1,5 @@
 package com.newtpond.testnavdrawer.fragments;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -84,17 +83,7 @@ public class MainFragment extends Fragment {
         });
 
         if (rootView.findViewById(R.id.blogpost_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-large and
-            // res/values-sw600dp). If this view is present, then the
-            // activity should be in two-pane mode.
             mTwoPane = true;
-
-            // In two-pane mode, list items should be given the
-            // 'activated' state when touched.
-           /*((MainListFragment) getChildFragmentManager()
-                    .findFragmentById(R.id.blogpost_list))
-                    .setActivateOnItemClick(true);*/
         }
 
         return rootView;
@@ -108,34 +97,11 @@ public class MainFragment extends Fragment {
         return fragment;
     }
 
+    /*
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         ((MainActivity) activity).onSectionAttached(
                 getArguments().getInt(ARG_SECTION_NUMBER));
-    }
-
-    /*
-    public void onItemSelected(String id) {
-        if (mTwoPane) {
-            // In two-pane mode, show the detail view in this activity by
-            // adding or replacing the detail fragment using a
-            // fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putString(MainDetailFragment.ARG_ITEM_ID, id);
-            MainDetailFragment fragment = new MainDetailFragment();
-            fragment.setArguments(arguments);
-            getChildFragmentManager().beginTransaction()
-                    .replace(R.id.blogpost_detail_container, fragment)
-                    .commit();
-
-        } else {
-            // In single-pane mode, simply start the detail activity
-            // for the selected item ID.
-            Intent detailIntent = new Intent(this, BlogPostDetailActivity.class);
-            detailIntent.putExtra(MainDetailFragment.ARG_ITEM_ID, id);
-            startActivity(detailIntent);
-        }
-    }
-    */
+    }*/
 }
