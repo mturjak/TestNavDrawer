@@ -60,7 +60,8 @@ public class PlaceholderFragment extends Fragment {
     @Override
     public void onResume() {
         super.onStart();
-        ((MainActivity) getActivity()).setMapVisibility(View.INVISIBLE);
+        // TODO: uncomment this to hide map
+        //((MainActivity) getActivity()).setMapVisibility(View.INVISIBLE);
     }
 
 }

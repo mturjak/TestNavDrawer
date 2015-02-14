@@ -2,7 +2,11 @@ package com.newtpond.testnavdrawer;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,6 +20,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.newtpond.testnavdrawer.fragments.EditUserActivity;
 import com.newtpond.testnavdrawer.fragments.EditUserFragment;
 import com.newtpond.testnavdrawer.fragments.MainFragment;
@@ -29,7 +39,7 @@ import static com.newtpond.testnavdrawer.utils.NetworkAvailable.noNetworkAlert;
 
 
 public class MainActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, OnMapReadyCallback {
 
     private boolean mIsDrawerLocked = false;
     private DrawerLayout mDrawerLayout;
@@ -54,7 +64,8 @@ public class MainActivity extends ActionBarActivity
     private Fragment mMomentFragment;
     private Fragment mFriendsFragment;
 
-    private View mMap;
+    private View mMapView;
+    private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +73,23 @@ public class MainActivity extends ActionBarActivity
         setContentView(R.layout.activity_main);
 
         if (findViewById(R.id.main_list_map) != null) {
-            mMap = findViewById(R.id.main_list_map);
+            mMapView = findViewById(R.id.main_list_map);
+            mMap = ((SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.main_list_map))
+                    .getMap();
+
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Location location = locationManager
+                    .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            double lat =  location.getLatitude();
+            double lng = location.getLongitude();
+            LatLng coordinate = new LatLng(lat, lng);
+
+            CameraUpdate center = CameraUpdateFactory.newLatLng(coordinate);
+            CameraUpdate zoom = CameraUpdateFactory.zoomTo(13);
+
+            mMap.moveCamera(center);
+            mMap.animateCamera(zoom);
         }
 
         ParseUser currentUser = ParseUser.getCurrentUser();
@@ -280,8 +307,13 @@ public class MainActivity extends ActionBarActivity
     }
 
     public void setMapVisibility(int visibility) {
-        if(mMap != null && mMap.getVisibility() != visibility) {
-            mMap.setVisibility(visibility);
+        if(mMapView != null && mMapView.getVisibility() != visibility) {
+            mMapView.setVisibility(visibility);
         }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
     }
 }
