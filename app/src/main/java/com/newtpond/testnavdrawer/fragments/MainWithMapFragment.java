@@ -14,9 +14,6 @@ import android.widget.ListView;
 import com.newtpond.testnavdrawer.MainActivity;
 import com.newtpond.testnavdrawer.R;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * A list fragment representing a list of BlogPosts. This fragment
  * also supports tablet devices by allowing list items to be given an
@@ -26,75 +23,26 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link /Callbacks}
  * interface.
  */
-public class MainFragment extends Fragment {
+public class MainWithMapFragment extends Fragment {
 
     public static final String ARG_SECTION_NUMBER = "section_id";
 
     private boolean mTwoPane = false;
 
-    public MainFragment() {
+    public MainWithMapFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        final View rootView = inflater.inflate(R.layout.fragment_main_list, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_main_list_w_map, container, false);
 
         if (rootView.findViewById(R.id.blogpost_detail_container) != null) {
             mTwoPane = true;
         }
 
         return rootView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        View rootView = getView();
-
-        ListView mainList = (ListView)rootView.findViewById(android.R.id.list);
-
-        int section = ((MainActivity)getActivity()).getCurrentSection();
-
-        MainListAdapter adapter = new MainListAdapter(getActivity(),false);
-
-        if(section > 0) {
-            List<DummyContent.DummyItem> filtered = new ArrayList<DummyContent.DummyItem>();
-            for (DummyContent.DummyItem item : DummyContent.ITEMS) {
-                if (item.getType() == section)
-                    filtered.add(item);
-            }
-            adapter.updateItems(filtered);
-        } else {
-            adapter.updateItems(DummyContent.ITEMS);
-        }
-
-        mainList.setAdapter(adapter);
-
-        mainList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                if(mTwoPane) {
-                    Fragment fragment = getFragment(position);
-
-                    // add position as argument
-                    Bundle arguments = new Bundle();
-                    arguments.putInt(MainFragment.ARG_SECTION_NUMBER, position);
-                    fragment.setArguments(arguments);
-
-                    FragmentManager fragmentManager = getChildFragmentManager();
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.blogpost_detail_container, fragment)
-                            .commit();
-                } else {
-                    Intent detailIntent = new Intent(parent.getContext(), BlogPostDetailActivity.class);
-                    detailIntent.putExtra(MainDetailFragment.ARG_ITEM_ID, position);
-                    startActivity(detailIntent);
-                }
-            }
-        });
     }
 
     private Fragment getFragment(int position) {
@@ -110,5 +58,44 @@ public class MainFragment extends Fragment {
         super.onAttach(activity);
         ((MainActivity) activity).onSectionAttached(
                 getArguments().getInt(ARG_SECTION_NUMBER));
+    }
+
+    @Override
+    public void onResume() {
+        super.onStart();
+        ((MainActivity) getActivity()).setMapVisibility(View.VISIBLE);
+
+        View rootView = getView();
+
+        ListView mainList = (ListView)rootView.findViewById(android.R.id.list);
+
+        MainListAdapter adapter = new MainListAdapter(getActivity(),true);
+
+        adapter.updateItems(DummyContent.ITEMS);
+
+        mainList.setAdapter(adapter);
+
+        mainList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                if(mTwoPane) {
+                    Fragment fragment = getFragment(position);
+
+                    // add position as argument
+                    Bundle arguments = new Bundle();
+                    arguments.putInt(MainWithMapFragment.ARG_SECTION_NUMBER, position);
+                    fragment.setArguments(arguments);
+
+                    FragmentManager fragmentManager = getChildFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.blogpost_detail_container, fragment)
+                            .commit();
+                } else {
+                    Intent detailIntent = new Intent(parent.getContext(), BlogPostDetailActivity.class);
+                    detailIntent.putExtra(MainDetailFragment.ARG_ITEM_ID, position);
+                    startActivity(detailIntent);
+                }
+            }
+        });
     }
 }

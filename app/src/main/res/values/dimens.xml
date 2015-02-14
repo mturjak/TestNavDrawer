@@ -42,5 +42,6 @@
     <dimen name="avatar_margin_left">12dp</dimen>
     <dimen name="contact_margin_left">28dp</dimen>
 
-
+    <!-- map -->
+    <dimen name="map_item_height">180dp</dimen>
 </resources>

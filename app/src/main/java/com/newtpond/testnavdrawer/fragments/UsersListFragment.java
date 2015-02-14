@@ -51,6 +51,8 @@ public class UsersListFragment extends ListFragment {
     public void onResume() {
         super.onResume();
 
+        ((MainActivity)getActivity()).setMapVisibility(View.INVISIBLE);
+
         mCurrentUser = ParseUser.getCurrentUser();
         mFriendsRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
 
@@ -100,5 +102,4 @@ public class UsersListFragment extends ListFragment {
         intent.putExtra(ParseConstants.KEY_USERNAME, mFriends.get(position).getUsername());
         startActivity(intent);
     }
-
 }

@@ -13,12 +13,13 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 
 import com.newtpond.testnavdrawer.fragments.EditUserActivity;
 import com.newtpond.testnavdrawer.fragments.EditUserFragment;
-import com.newtpond.testnavdrawer.fragments.MainDetailFragment;
 import com.newtpond.testnavdrawer.fragments.MainFragment;
+import com.newtpond.testnavdrawer.fragments.MainWithMapFragment;
 import com.newtpond.testnavdrawer.fragments.PlaceholderFragment;
 import com.newtpond.testnavdrawer.fragments.UsersListFragment;
 import com.parse.ParseUser;
@@ -53,10 +54,16 @@ public class MainActivity extends ActionBarActivity
     private Fragment mMomentFragment;
     private Fragment mFriendsFragment;
 
+    private View mMap;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (findViewById(R.id.main_list_map) != null) {
+            mMap = findViewById(R.id.main_list_map);
+        }
 
         ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser != null) {
@@ -129,7 +136,11 @@ public class MainActivity extends ActionBarActivity
                 if(mMainFragment != null) {
                     return mMainFragment;
                 } else {
-                    fragment = new MainFragment();
+                    if(getResources().getDimensionPixelSize(R.dimen.drawer_content_padding) == 0) {
+                        fragment = new MainWithMapFragment();
+                    } else {
+                        fragment = new MainFragment();
+                    }
                     mMainFragment = fragment;
                 }
                 break;
@@ -266,5 +277,11 @@ public class MainActivity extends ActionBarActivity
 
     public int getCurrentSection() {
         return mCurrentSection;
+    }
+
+    public void setMapVisibility(int visibility) {
+        if(mMap != null && mMap.getVisibility() != visibility) {
+            mMap.setVisibility(visibility);
+        }
     }
 }

@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 
+import com.newtpond.testnavdrawer.MainActivity;
 import com.newtpond.testnavdrawer.R;
 
 import java.util.ArrayList;
@@ -17,20 +18,22 @@ import java.util.List;
 /**
  * GrabListAdapter displays items in the offers' list
  */
-final class MainListAdapter<T> extends BaseAdapter implements Filterable {
+final class MainListAdapter extends BaseAdapter implements Filterable {
 
     private final Context mContext;
     private final LayoutInflater mLayoutInflater;
-    private List<T> mItems = Collections.emptyList();
+    private List<DummyContent.DummyItem> mItems = Collections.emptyList();
     private int mAvatarImageViewPixelSize;
+    private boolean mWithMap = false;
 
-    public MainListAdapter(Context context) {
+    public MainListAdapter(Context context, boolean withMap) {
+        mWithMap = withMap;
         mContext = context;
         mAvatarImageViewPixelSize = context.getResources().getDimensionPixelSize(R.dimen.user_profile_img_size);
         mLayoutInflater = LayoutInflater.from(context);
     }
 
-    public void updateItems(List<T> items) {
+    public void updateItems(List<DummyContent.DummyItem> items) {
         mItems = items;
         notifyDataSetChanged();
     }
@@ -41,7 +44,7 @@ final class MainListAdapter<T> extends BaseAdapter implements Filterable {
     }
 
     @Override
-    public T getItem(int position) {
+    public DummyContent.DummyItem getItem(int position) {
         return mItems.get(position);
 
     }
@@ -54,17 +57,23 @@ final class MainListAdapter<T> extends BaseAdapter implements Filterable {
     // this needs to be set to the number of different row layout types
     @Override
     public int getViewTypeCount() {
-        return 2;
+        return 4;
     }
 
     // this must return int from 0 to getViewTypeCount-1
     @Override
     public int getItemViewType(int position) {
-        T item = mItems.get(position);
-        if(item instanceof DummyContent.DummyItem){
-            return ((DummyContent.DummyItem)item).getType() - 1;
+        DummyContent.DummyItem item = mItems.get(position);
+        if(mWithMap && position == 0) {
+            if(item.getType() == 1) {
+                return 2;
+            } else {
+                return 3;
+            }
+        } else if(item.getType() == 1) {
+            return 0;
         }
-        return 0;
+        return 1;
     }
 
     @Override
@@ -83,7 +92,7 @@ final class MainListAdapter<T> extends BaseAdapter implements Filterable {
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
 
-                mItems = (List<T>) results.values;
+                mItems = (List<DummyContent.DummyItem>) results.values;
                 notifyDataSetChanged();
             }
 
@@ -91,13 +100,13 @@ final class MainListAdapter<T> extends BaseAdapter implements Filterable {
             protected FilterResults performFiltering(CharSequence constraint) {
 
                 FilterResults results = new FilterResults();
-                ArrayList<T> FilteredArray = new ArrayList<T>();
+                ArrayList<DummyContent.DummyItem> FilteredArray = new ArrayList<DummyContent.DummyItem>();
 
                 // perform your search here using the searchConstraint String.
 
                 constraint = constraint.toString().toLowerCase();
                 for (int i = 0; i < getCount(); i++) {
-                    T item = getItem(i);
+                    DummyContent.DummyItem item = getItem(i);
                     if (item.toString().toLowerCase().startsWith(constraint.toString()))  {
                         FilteredArray.add(item);
                     }
@@ -117,22 +126,34 @@ final class MainListAdapter<T> extends BaseAdapter implements Filterable {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         int type = getItemViewType(position);
+        DummyContent.DummyItem item = getItem(position);
 
         if (convertView == null) {
-            switch(type) {
-                case 0:
-                    convertView = mLayoutInflater.inflate(R.layout.grab_list_item, null);
+            switch (type) {
+                case 3:
+                    convertView = mLayoutInflater.inflate(R.layout.moment_list_item_w_map, null);
+                    break;
+                case 2:
+                    convertView = mLayoutInflater.inflate(R.layout.grab_list_item_w_map, null);
+                    break;
+                case 1:
+                    convertView = mLayoutInflater.inflate(R.layout.moment_list_item, null);
                     break;
                 default:
-                    convertView = mLayoutInflater.inflate(R.layout.moment_list_item, null);
+                    convertView = mLayoutInflater.inflate(R.layout.grab_list_item, null);
                     break;
             }
         }
 
-        if (position % 2 == 0) {
-            convertView.setBackgroundColor(0x00ffffff);
-        } else {
-            convertView.setBackgroundColor(0x99ffffff);
+        if(type > 1) {
+            convertView.findViewById(R.id.map_spacer).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mContext instanceof MainActivity){
+                        ((MainActivity)mContext).editUser();
+                    }
+                }
+            });
         }
 
         return convertView;

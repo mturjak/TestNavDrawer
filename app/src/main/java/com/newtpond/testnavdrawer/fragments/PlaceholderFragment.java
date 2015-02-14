@@ -57,4 +57,10 @@ public class PlaceholderFragment extends Fragment {
                 getArguments().getInt(ARG_SECTION_NUMBER));
     }
 
+    @Override
+    public void onResume() {
+        super.onStart();
+        ((MainActivity) getActivity()).setMapVisibility(View.INVISIBLE);
+    }
+
 }
