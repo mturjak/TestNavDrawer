@@ -10,6 +10,6 @@ android:layout_gravity="start" >
         android:choiceMode="singleChoice"
         android:divider="#cccccc"
         android:dividerHeight="1dp"
-        android:listSelector="@drawable/list_selector" />
+        android:listSelector="@drawable/no_selector" />
 
 </RelativeLayout>

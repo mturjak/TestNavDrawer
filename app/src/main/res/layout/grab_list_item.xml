@@ -10,7 +10,7 @@
     android:paddingEnd="@dimen/drawer_item_padding_x"
     android:paddingLeft="@dimen/drawer_item_padding_x"
     android:paddingStart="@dimen/drawer_item_padding_x"
-    android:background="#fffdfdfd"
+    android:background="@drawable/main_list_selector"
     android:weightSum="1">
 
     <com.makeramen.RoundedImageView

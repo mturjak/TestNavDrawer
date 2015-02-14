@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/map_item_height"
         android:text=""
-        android:textColor="@android:color/transparent" />
+        android:textColor="@android:color/transparent"
+        android:background="@drawable/no_selector" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -23,7 +24,7 @@
         android:paddingEnd="@dimen/drawer_item_padding_x"
         android:paddingLeft="@dimen/drawer_item_padding_x"
         android:paddingStart="@dimen/drawer_item_padding_x"
-        android:background="#fffdfdfd">
+        android:background="@drawable/main_list_selector" >
 
         <RelativeLayout
             android:id="@+id/moment_item_head"
