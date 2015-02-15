@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
@@ -26,8 +25,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.newtpond.testnavdrawer.fragments.EditUserActivity;
-import com.newtpond.testnavdrawer.fragments.EditUserFragment;
+import com.newtpond.testnavdrawer.fragments.EditProfileActivity;
+import com.newtpond.testnavdrawer.fragments.EditProfileFragment;
 import com.newtpond.testnavdrawer.fragments.MainFragment;
 import com.newtpond.testnavdrawer.fragments.MainWithMapFragment;
 import com.newtpond.testnavdrawer.fragments.PlaceholderFragment;
@@ -54,7 +53,6 @@ public class MainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
 
-
     /**
      * Section fragments
      */
@@ -65,6 +63,7 @@ public class MainActivity extends ActionBarActivity
     private Fragment mFriendsFragment;
 
     private View mMapView;
+    private SupportMapFragment mMapFragment;
     private GoogleMap mMap;
 
     @Override
@@ -74,22 +73,10 @@ public class MainActivity extends ActionBarActivity
 
         if (findViewById(R.id.main_list_map) != null) {
             mMapView = findViewById(R.id.main_list_map);
-            mMap = ((SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.main_list_map))
-                    .getMap();
+            mMapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.main_list_map);
 
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            Location location = locationManager
-                    .getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            double lat =  location.getLatitude();
-            double lng = location.getLongitude();
-            LatLng coordinate = new LatLng(lat, lng);
-
-            CameraUpdate center = CameraUpdateFactory.newLatLng(coordinate);
-            CameraUpdate zoom = CameraUpdateFactory.zoomTo(13);
-
-            mMap.moveCamera(center);
-            mMap.animateCamera(zoom);
+            mMapFragment.getMapAsync(this);
         }
 
         ParseUser currentUser = ParseUser.getCurrentUser();
@@ -104,6 +91,11 @@ public class MainActivity extends ActionBarActivity
         } else {
             navigateTo(LoginActivity.class, true);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -277,8 +269,12 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onBackPressed() {
-        if(!mNavigationDrawerFragment.isDrawerOpen() && !mIsDrawerLocked) {
-            mDrawerLayout.openDrawer(Gravity.START);
+        if(mCurrentSection != 0) {
+            ((ListView)mDrawerLayout.findViewById(android.R.id.list)).setItemChecked(0, true);
+            onNavigationDrawerItemSelected(0);
+            mCurrentSection = 0;
+        } else if (mNavigationDrawerFragment.isDrawerOpen() && !mIsDrawerLocked) {
+            mDrawerLayout.closeDrawer(Gravity.START);
         } else {
             MainActivity.super.onBackPressed();
         }
@@ -295,10 +291,10 @@ public class MainActivity extends ActionBarActivity
 
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(R.id.container, new EditUserFragment()) // TODO: use instance instead of instantiating again
+                    .replace(R.id.container, new EditProfileFragment()) // TODO: use instance instead of instantiating again
                     .commit();
         } else {
-            navigateTo(EditUserActivity.class, false);
+            navigateTo(EditProfileActivity.class, false);
         }
     }
 
@@ -314,6 +310,19 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        mMap = mMapFragment.getMap();
 
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Location location = locationManager
+                .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        double lat =  location.getLatitude();
+        double lng = location.getLongitude();
+        LatLng coordinate = new LatLng(lat, lng);
+
+        CameraUpdate center = CameraUpdateFactory.newLatLng(coordinate);
+        CameraUpdate zoom = CameraUpdateFactory.zoomTo(13);
+
+        mMap.moveCamera(center);
+        mMap.animateCamera(zoom);
     }
 }

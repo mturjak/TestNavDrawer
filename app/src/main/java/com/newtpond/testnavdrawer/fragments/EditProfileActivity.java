@@ -21,7 +21,7 @@ public class EditProfileActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_main_detail);
+        setContentView(R.layout.activity_edit_profile);
 
         // Show the Up button in the action bar.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -35,18 +35,15 @@ public class EditProfileActivity extends ActionBarActivity {
         //
         // http://developer.android.com/guide/components/fragments.html
         //
-        /*if (savedInstanceState == null) {
+        if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putString(MainDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(MainDetailFragment.ARG_ITEM_ID));
-            MainDetailFragment fragment = new MainDetailFragment();
-            fragment.setArguments(arguments);
+
+            EditProfileFragment fragment = new EditProfileFragment();
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.blogpost_detail_container, fragment)
+                    .add(R.id.container, fragment)
                     .commit();
-        }*/
+        }
     }
 
     @Override

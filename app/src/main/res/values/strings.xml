@@ -26,9 +26,16 @@
     <string name="network_not_available">No network connection available.</string>
     <string name="network_error_title">Network error</string>
     <string name="title_activity_blogpostdetail">BlogPostDetailActivity</string>
-    <string name="title_activity_edituser">EditUserActivity</string>
+    <string name="title_activity_edituser">EditProfileActivity</string>
     <string name="been_there_num">52 friends</string>
     <string name="edit_friends_error_title">Sorry, something went wrong.</string>
     <string name="empty_friends_label">Add friends to begin!</string>
+    <string name="name_hint">Display Name</string>
+    <string name="hometown_hint">Hometown</string>
+    <string name="website_hint">Website</string>
+    <string name="email_hint">Email</string>
+    <string name="save_button_label">Save</string>
+    <string name="edit_profile_error_title">Sorry! Changes could not be saved.</string>
+    <string name="edit_profile_error_message_no_email">You need to provide an email address.</string>
 
 </resources>

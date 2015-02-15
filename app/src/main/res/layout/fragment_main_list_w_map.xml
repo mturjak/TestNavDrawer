@@ -8,7 +8,7 @@ android:layout_gravity="start" >
         android:layout_height="match_parent"
         android:id="@android:id/list"
         android:choiceMode="singleChoice"
-        android:divider="#cccccc"
+        android:divider="#eeeeee"
         android:dividerHeight="1dp"
         android:listSelector="@drawable/no_selector" />
 

@@ -41,8 +41,9 @@
                 android:value="com.newtpond.testnavdrawer.MainActivity" />
         </activity>
         <activity
-            android:name=".fragments.EditUserActivity"
+            android:name=".fragments.EditProfileActivity"
             android:label="@string/title_activity_edituser"
+            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

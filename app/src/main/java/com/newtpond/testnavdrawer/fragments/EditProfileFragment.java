@@ -28,8 +28,7 @@ public class EditProfileFragment extends Fragment {
     }
 
     protected ParseUser mCurrentUser;
-    protected EditText mFirstName;
-    protected EditText mLastName;
+    protected EditText mName;
     protected EditText mHometown;
     protected EditText mWebsite;
     protected EditText mEmail;
@@ -52,8 +51,7 @@ public class EditProfileFragment extends Fragment {
         View rootView = getView();
 
         mEmail = (EditText) rootView.findViewById(R.id.emailField);
-        mFirstName = (EditText) rootView.findViewById(R.id.nameField);
-        mLastName = (EditText) rootView.findViewById(R.id.lastNameField);
+        mName = (EditText) rootView.findViewById(R.id.nameField);
         mHometown = (EditText) rootView.findViewById(R.id.hometown);
         mWebsite = (EditText) rootView.findViewById(R.id.website);
         mSaveButton = (Button) rootView.findViewById(R.id.saveButton);
@@ -61,27 +59,27 @@ public class EditProfileFragment extends Fragment {
         mCurrentUser = ParseUser.getCurrentUser();
         mFacebookId = mCurrentUser.getString("facebookId");
 
+        ((TextView) rootView.findViewById(R.id.mainField))
+                .setText("Edit: " + mCurrentUser.getString("displayName"));
+
         ((TextView) rootView.findViewById(R.id.usernameField))
                 .setText(mCurrentUser.getUsername());
 
         mEmail.setText(mCurrentUser.getEmail());
-        mFirstName.setText(mCurrentUser.getString("firstName"));
-        mLastName.setText(mCurrentUser.getString("lastName"));
+        mName.setText(mCurrentUser.getString("displayName"));
         mHometown.setText(mCurrentUser.getString("hometown"));
         mWebsite.setText(mCurrentUser.getString("website"));
 
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String firstName = mFirstName.getText().toString();
-                String lastName = mLastName.getText().toString();
+                String displayName = mName.getText().toString();
                 String hometown = mHometown.getText().toString();
                 String website = mWebsite.getText().toString();
                 String email = mEmail.getText().toString();
 
                 email = email.trim();
-                firstName = firstName.trim();
-                lastName = lastName.trim();
+                displayName = displayName.trim();
                 hometown = hometown.trim();
                 website = website.trim();
 
@@ -95,8 +93,7 @@ public class EditProfileFragment extends Fragment {
                     dialog.show();
                 } else {
                     mCurrentUser.setEmail(email);
-                    mCurrentUser.put("firstName", firstName);
-                    mCurrentUser.put("lastName", lastName);
+                    mCurrentUser.put("displayName", displayName);
                     mCurrentUser.put("hometown", hometown);
                     mCurrentUser.put("website", website);
 
@@ -113,6 +110,8 @@ public class EditProfileFragment extends Fragment {
                             }
                         }
                     });
+
+
                 }
             }
         });
