@@ -16,7 +16,7 @@ import com.newtpond.testnavdrawer.R;
  * This activity is mostly just a 'shell' activity containing nothing
  * more than a {@link /BlogPostDetailFragment}.
  */
-public class EditUserActivity extends ActionBarActivity {
+public class EditProfileActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
