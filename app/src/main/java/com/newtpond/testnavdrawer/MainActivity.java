@@ -91,16 +91,11 @@ public class MainActivity extends ActionBarActivity
         } else {
             navigateTo(LoginActivity.class, true);
         }
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+        mTitle = getTitle();
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-
-        mTitle = getTitle();
 
         // drawer_content_padding is set to 0 on handsets and to 240 on tablets,
         // so we can use it as a switch for locking the drawer
@@ -113,6 +108,17 @@ public class MainActivity extends ActionBarActivity
                 R.id.navigation_drawer,
                 mDrawerLayout,
                 mIsDrawerLocked);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        /*if(mDrawerLayout != null) {
+            // refresh adapter on resume activity
+            ((ProfileDrawerAdapter) ((ListView) mDrawerLayout.findViewById(android.R.id.list))
+                    .getAdapter()).notifyDataSetChanged();
+        }*/
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

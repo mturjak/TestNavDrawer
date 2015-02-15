@@ -89,7 +89,7 @@ public class LoginActivity extends Activity {
         mSignUpTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
                 startActivity(intent);
             }
         });
@@ -209,10 +209,6 @@ public class LoginActivity extends Activity {
                         public void onCompleted(GraphUser user,
                                                 Response response) {
                             if (user != null) {
-                                ParseUser.getCurrentUser().put("firstName",
-                                        user.getFirstName());
-                                ParseUser.getCurrentUser().put("lastName",
-                                        user.getLastName());
                                 ParseUser.getCurrentUser().put("displayName",
                                         user.getName());
                                 ParseUser.getCurrentUser().put("facebookId",
@@ -226,7 +222,6 @@ public class LoginActivity extends Activity {
                                     Toast.makeText(getApplicationContext(),
                                             R.string.session_invalid_error,
                                             Toast.LENGTH_LONG).show();
-
                                 } else {
                                     // TODO: make dialog error instead of toast
                                     Toast.makeText(getApplicationContext(),

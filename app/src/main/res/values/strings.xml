@@ -37,5 +37,8 @@
     <string name="save_button_label">Save</string>
     <string name="edit_profile_error_title">Sorry! Changes could not be saved.</string>
     <string name="edit_profile_error_message_no_email">You need to provide an email address.</string>
+    <string name="signup_button_label">Sign Up!</string>
+    <string name="signup_error_title">Sign-up failed!</string>
+    <string name="title_activity_sign_up">Sign Up</string>
 
 </resources>

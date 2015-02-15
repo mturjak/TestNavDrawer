@@ -59,14 +59,17 @@ public class EditProfileFragment extends Fragment {
         mCurrentUser = ParseUser.getCurrentUser();
         mFacebookId = mCurrentUser.getString("facebookId");
 
+        String displayName = mCurrentUser.getString("displayName");
+        String userName = mCurrentUser.getUsername();
+
         ((TextView) rootView.findViewById(R.id.mainField))
-                .setText("Edit: " + mCurrentUser.getString("displayName"));
+                .setText(displayName);
 
         ((TextView) rootView.findViewById(R.id.usernameField))
-                .setText(mCurrentUser.getUsername());
+                .setText("username: " + userName);
 
         mEmail.setText(mCurrentUser.getEmail());
-        mName.setText(mCurrentUser.getString("displayName"));
+        mName.setText(displayName);
         mHometown.setText(mCurrentUser.getString("hometown"));
         mWebsite.setText(mCurrentUser.getString("website"));
 
@@ -84,7 +87,7 @@ public class EditProfileFragment extends Fragment {
                 website = website.trim();
 
 
-                if (email.isEmpty() && mFacebookId == "0") {
+                if (email.isEmpty() && mFacebookId.equals("0")) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setMessage(R.string.edit_profile_error_message_no_email)
                             .setTitle(R.string.edit_profile_error_title)

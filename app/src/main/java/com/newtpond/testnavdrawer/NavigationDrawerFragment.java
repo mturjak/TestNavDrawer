@@ -85,17 +85,19 @@ public class NavigationDrawerFragment extends ListFragment {
 
         mCurrentUser = ParseUser.getCurrentUser();
         if(mCurrentUser != null) {
-            // prepare user profile info for the drawer
-            if(mCurrentUser.get("facebookId").toString().equals("0")) {
-                // if no facebookId try getting a Gravatar
-                mAvatarUrl = Gravatar.init()
-                        .with(mCurrentUser.getEmail())
-                        .force404()
-                        .size(getResources().getDimensionPixelSize(R.dimen.user_profile_img_size))
-                        .build();
-            } else {
-                // if has facebookId get facebook avatar
-                mAvatarUrl = "https://graph.facebook.com/" + mCurrentUser.get("facebookId").toString() + "/picture?type=large";
+            if(mCurrentUser.get("facebookId") != null) {
+                // prepare user profile info for the drawer
+                if (mCurrentUser.getString("facebookId").equals("0")) {
+                    // if no facebookId try getting a Gravatar
+                    mAvatarUrl = Gravatar.init()
+                            .with(mCurrentUser.getEmail())
+                            .force404()
+                            .size(getResources().getDimensionPixelSize(R.dimen.user_profile_img_size))
+                            .build();
+                } else {
+                    // if has facebookId get facebook avatar
+                    mAvatarUrl = "https://graph.facebook.com/" + mCurrentUser.getString("facebookId") + "/picture?type=large";
+                }
             }
 
             // try getting user name to display
