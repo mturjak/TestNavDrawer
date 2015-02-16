@@ -2,10 +2,8 @@ package com.newtpond.testnavdrawer;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,6 +23,11 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,12 +41,15 @@ import com.newtpond.testnavdrawer.fragments.PlaceholderFragment;
 import com.newtpond.testnavdrawer.fragments.UsersListFragment;
 import com.parse.ParseUser;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 import static com.newtpond.testnavdrawer.utils.NetworkAvailable.isNetworkAvailable;
 import static com.newtpond.testnavdrawer.utils.NetworkAvailable.noNetworkAlert;
 
 
 public class MainActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, View.OnTouchListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, View.OnTouchListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private boolean mIsDrawerLocked = false;
     private DrawerLayout mDrawerLayout;
@@ -67,6 +73,17 @@ public class MainActivity extends ActionBarActivity
     private Fragment mMomentFragment;
     private Fragment mFriendsFragment;
 
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
+    private LocationRequest mLocationRequest;
+    private String mLastUpdateTime;
+
+    private final String REQUESTING_LOCATION_UPDATES_KEY = "request_location_updates";
+    private final String LOCATION_KEY = "last_location";
+    private final String LAST_UPDATED_TIME_STRING_KEY = "last_updated_time";
+
+    private boolean mRequestingLocationUpdates = true;
+
     private MapView mMapView;
     private GoogleMap mMap;
 
@@ -83,6 +100,14 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        updateValuesFromBundle(savedInstanceState);
+
+        if(mGoogleApiClient == null) {
+            buildGoogleApiClient();
+        }
+
+        createLocationRequest();
+
         if (findViewById(R.id.main_list_map) != null) {
             mMapView = (MapView) findViewById(R.id.main_list_map);
             mMapView.onCreate(savedInstanceState);
@@ -91,7 +116,7 @@ public class MainActivity extends ActionBarActivity
             mDivider = (RelativeLayout)findViewById(R.id.layout_draggable);
             mMapSegment= (FrameLayout)findViewById(R.id.map_segment);
 
-            findViewById(R.id.layout_draggable).setOnTouchListener(this);
+            mDivider.setOnTouchListener(this);
 
             if(mMap == null) {
                 MapsInitializer.initialize(this);
@@ -140,14 +165,23 @@ public class MainActivity extends ActionBarActivity
     protected void onResume() {
         super.onResume();
 
+        if(!mGoogleApiClient.isConnected())
+            mGoogleApiClient.connect();
+
+        if (mGoogleApiClient.isConnected() && !mRequestingLocationUpdates) {
+            startLocationUpdates();
+        }
+
         if(mMapView != null)
             mMapView.onResume();
 
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        mHeight = displaymetrics.heightPixels;
+        if(mDivider != null) {
+            DisplayMetrics displaymetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+            mHeight = displaymetrics.heightPixels;
 
-        Log.e("height", "" + mHeight);
+            Log.e("height", "" + mHeight);
+        }
 
         setUpMapIfNeeded();
 
@@ -347,6 +381,11 @@ public class MainActivity extends ActionBarActivity
 
         if(mMapView != null)
             mMapView.onPause();
+
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
     }
 
     @Override
@@ -367,12 +406,18 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     protected void onSaveInstanceState(Bundle b) {
-        super.onSaveInstanceState(b);
 
         if(mMapView != null)
             mMapView.onSaveInstanceState(b);
 
-        // Do your save instance
+        b.putBoolean(REQUESTING_LOCATION_UPDATES_KEY,
+            mRequestingLocationUpdates);
+
+        b.putParcelable(LOCATION_KEY, mLastLocation);
+        b.putString(LAST_UPDATED_TIME_STRING_KEY, mLastUpdateTime);
+
+        super.onSaveInstanceState(b);
+
     }
 
     /**
@@ -382,7 +427,7 @@ public class MainActivity extends ActionBarActivity
      */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
-        if (mMapView!= null && mMap == null) {
+        if (mMap == null) {
 
             mMap = mMapView.getMap();
 
@@ -393,19 +438,118 @@ public class MainActivity extends ActionBarActivity
     }
 
     private void setUpMap() {
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        /*LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Location location = locationManager
-                .getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        double lat =  location.getLatitude();
-        double lng = location.getLongitude();
-        LatLng coordinate = new LatLng(lat, lng);
+                .getLastKnownLocation(LocationManager.GPS_PROVIDER);*/
 
-        CameraUpdate center = CameraUpdateFactory.newLatLng(coordinate);
-        CameraUpdate zoom = CameraUpdateFactory.zoomTo(13);
+        if (mLastLocation != null) {
+            double lat = mLastLocation.getLatitude();
+            double lng = mLastLocation.getLongitude();
+            LatLng coordinate = new LatLng(lat, lng);
 
-        mMap.moveCamera(center);
-        mMap.animateCamera(zoom);
+            CameraUpdate center = CameraUpdateFactory.newLatLng(coordinate);
+            CameraUpdate zoom = CameraUpdateFactory.zoomTo(13);
+
+            mMap.moveCamera(center);
+            mMap.animateCamera(zoom);
+        }
     }
+
+
+    /**
+     *
+     * Next part includes mostly google api client and location methods
+     *
+     *
+     */
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+
+        Log.e("googleApi", mGoogleApiClient.toString());
+    }
+
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+
+        if(mLastLocation == null) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }
+        else {
+            setUpMap();
+        }
+
+    }
+
+    protected void startLocationUpdates() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+    }
+
+    // called from onPause method
+    /*protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
+    }*/
+    // we disconected the client instead onPause
+
+    private void updateValuesFromBundle(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            // Update the value of mRequestingLocationUpdates from the Bundle, and
+            // make sure that the Start Updates and Stop Updates buttons are
+            // correctly enabled or disabled.
+            if (savedInstanceState.keySet().contains(REQUESTING_LOCATION_UPDATES_KEY)) {
+                mRequestingLocationUpdates = savedInstanceState.getBoolean(
+                        REQUESTING_LOCATION_UPDATES_KEY);
+            }
+
+            // Update the value of mCurrentLocation from the Bundle and update the
+            // UI to show the correct latitude and longitude.
+            if (savedInstanceState.keySet().contains(LOCATION_KEY)) {
+                // Since LOCATION_KEY was found in the Bundle, we can be sure that
+                // mCurrentLocationis not null.
+                mLastLocation = savedInstanceState.getParcelable(LOCATION_KEY);
+            }
+
+            // Update the value of mLastUpdateTime from the Bundle and update the UI.
+            if (savedInstanceState.keySet().contains(LAST_UPDATED_TIME_STRING_KEY)) {
+                mLastUpdateTime = savedInstanceState.getString(
+                        LAST_UPDATED_TIME_STRING_KEY);
+            }
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.e("GoogleApi","connection suspended");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.e("GoogleApi","connection failed");
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mLastLocation = location;
+        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+
+        setUpMap();
+    }
+
+
 
     /**
      * Draggable screen divider touch listener
@@ -469,34 +613,41 @@ public class MainActivity extends ActionBarActivity
     }
 
     public boolean dividerVisible() {
-        return mDivider.getHeight() > 0;
+        if(mDivider != null)
+            return mDivider.getHeight() > 0;
+
+        return true;
     }
 
     public void makeDividerVisibile(boolean v) {
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mDivider.getLayoutParams();
-        if(v) {
-            params.height = 20;
-        } else {
-            params.height = 0;
+        if(mDivider != null) {
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mDivider.getLayoutParams();
+            if (v) {
+                params.height = 20;
+            } else {
+                params.height = 0;
+            }
+            mDivider.setLayoutParams(params);
         }
-        mDivider.setLayoutParams(params);
     }
 
     public void switchView(float bottomWeight, boolean showDivider) {
-        if(showDivider && !dividerVisible()) {
-            makeDividerVisibile(true);
-        } else if(!showDivider && dividerVisible()) {
-            makeDividerVisibile(false);
+        if(mDivider != null) {
+            if (showDivider && !dividerVisible()) {
+                makeDividerVisibile(true);
+            } else if (!showDivider && dividerVisible()) {
+                makeDividerVisibile(false);
+            }
+
+            LinearLayout.LayoutParams params1 = (LinearLayout.LayoutParams) mContainer.getLayoutParams();
+            LinearLayout.LayoutParams params2 = (LinearLayout.LayoutParams) mMapSegment.getLayoutParams();
+
+            params1.weight = bottomWeight;
+            params2.weight = 1 - bottomWeight;
+
+            mWeightFactor = 0.003f;
+            mContainer.setLayoutParams(params1);
+            mMapSegment.setLayoutParams(params2);
         }
-
-        LinearLayout.LayoutParams params1 = (LinearLayout.LayoutParams) mContainer.getLayoutParams();
-        LinearLayout.LayoutParams params2 = (LinearLayout.LayoutParams) mMapSegment.getLayoutParams();
-
-        params1.weight = bottomWeight;
-        params2.weight = 1 - bottomWeight;
-
-        mWeightFactor = 0.003f;
-        mContainer.setLayoutParams(params1);
-        mMapSegment.setLayoutParams(params2);
     }
 }
