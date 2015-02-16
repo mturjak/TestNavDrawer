@@ -34,6 +34,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.newtpond.testnavdrawer.fragments.EditProfileActivity;
 import com.newtpond.testnavdrawer.fragments.EditProfileFragment;
 import com.newtpond.testnavdrawer.fragments.MainFragment;
@@ -427,7 +428,7 @@ public class MainActivity extends ActionBarActivity
      */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap == null) {
+        if (mMapView != null && mMap == null) {
 
             mMap = mMapView.getMap();
 
@@ -447,8 +448,14 @@ public class MainActivity extends ActionBarActivity
             double lng = mLastLocation.getLongitude();
             LatLng coordinate = new LatLng(lat, lng);
 
+            MarkerOptions options = new MarkerOptions()
+                    .position(coordinate)
+                    .title("I am here!");
+
             CameraUpdate center = CameraUpdateFactory.newLatLng(coordinate);
             CameraUpdate zoom = CameraUpdateFactory.zoomTo(13);
+
+            mMap.addMarker(options);
 
             mMap.moveCamera(center);
             mMap.animateCamera(zoom);
