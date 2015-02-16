@@ -51,7 +51,10 @@ public class UsersListFragment extends ListFragment {
     public void onResume() {
         super.onResume();
 
-        ((MainActivity)getActivity()).setMapVisibility(View.INVISIBLE);
+        // hide map and divider
+        if (((MainActivity)getActivity()).dividerVisible()) {
+            ((MainActivity) getActivity()).switchView(1, false);
+        }
 
         mCurrentUser = ParseUser.getCurrentUser();
         mFriendsRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);

@@ -3,6 +3,7 @@ package com.newtpond.testnavdrawer.fragments;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
@@ -52,13 +53,21 @@ public class MainFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
+        if(!((MainActivity)getActivity()).dividerVisible()) {
+            ((MainActivity) getActivity()).switchView(
+                    ((MainActivity) getActivity()).getBottomWeight()
+                    , true);
+        }
+
         View rootView = getView();
 
         ListView mainList = (ListView)rootView.findViewById(android.R.id.list);
 
+        Parcelable state = mainList.onSaveInstanceState();
+
         int section = ((MainActivity)getActivity()).getCurrentSection();
 
-        MainListAdapter adapter = new MainListAdapter(getActivity(),false);
+        MainListAdapter adapter = new MainListAdapter(getActivity());
 
         if(section > 0) {
             List<DummyContent.DummyItem> filtered = new ArrayList<DummyContent.DummyItem>();
@@ -95,6 +104,8 @@ public class MainFragment extends Fragment {
                 }
             }
         });
+
+        mainList.onRestoreInstanceState(state);
     }
 
     private Fragment getFragment(int position) {

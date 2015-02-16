@@ -13,22 +13,27 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.LatLng;
 import com.newtpond.testnavdrawer.fragments.EditProfileActivity;
 import com.newtpond.testnavdrawer.fragments.EditProfileFragment;
 import com.newtpond.testnavdrawer.fragments.MainFragment;
-import com.newtpond.testnavdrawer.fragments.MainWithMapFragment;
 import com.newtpond.testnavdrawer.fragments.PlaceholderFragment;
 import com.newtpond.testnavdrawer.fragments.UsersListFragment;
 import com.parse.ParseUser;
@@ -38,7 +43,7 @@ import static com.newtpond.testnavdrawer.utils.NetworkAvailable.noNetworkAlert;
 
 
 public class MainActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, OnMapReadyCallback {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, View.OnTouchListener {
 
     private boolean mIsDrawerLocked = false;
     private DrawerLayout mDrawerLayout;
@@ -62,9 +67,16 @@ public class MainActivity extends ActionBarActivity
     private Fragment mMomentFragment;
     private Fragment mFriendsFragment;
 
-    private View mMapView;
-    private SupportMapFragment mMapFragment;
+    private MapView mMapView;
     private GoogleMap mMap;
+
+    private FrameLayout mContainer;
+    private RelativeLayout mDivider;
+    private FrameLayout mMapSegment;
+    private float mWeightFactor = 0;
+    private float mBottomWeight = 0.7f;
+    private int mDividerTop;
+    private int mHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +84,25 @@ public class MainActivity extends ActionBarActivity
         setContentView(R.layout.activity_main);
 
         if (findViewById(R.id.main_list_map) != null) {
-            mMapView = findViewById(R.id.main_list_map);
-            mMapFragment = (SupportMapFragment) getSupportFragmentManager()
+            mMapView = (MapView) findViewById(R.id.main_list_map);
+            mMapView.onCreate(savedInstanceState);
+
+            mContainer = (FrameLayout)findViewById(R.id.container);
+            mDivider = (RelativeLayout)findViewById(R.id.layout_draggable);
+            mMapSegment= (FrameLayout)findViewById(R.id.map_segment);
+
+            findViewById(R.id.layout_draggable).setOnTouchListener(this);
+
+            if(mMap == null) {
+                MapsInitializer.initialize(this);
+            }
+
+            //mMap = mMapView.getMap();
+
+            /*mMapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.main_list_map);
 
-            mMapFragment.getMapAsync(this);
+            mMapFragment.getMapAsync(this);*/
         }
 
         ParseUser currentUser = ParseUser.getCurrentUser();
@@ -113,6 +139,17 @@ public class MainActivity extends ActionBarActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        if(mMapView != null)
+            mMapView.onResume();
+
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        mHeight = displaymetrics.heightPixels;
+
+        Log.e("height", "" + mHeight);
+
+        setUpMapIfNeeded();
 
         /*if(mDrawerLayout != null) {
             // refresh adapter on resume activity
@@ -161,11 +198,7 @@ public class MainActivity extends ActionBarActivity
                 if(mMainFragment != null) {
                     return mMainFragment;
                 } else {
-                    if(getResources().getDimensionPixelSize(R.dimen.drawer_content_padding) == 0) {
-                        fragment = new MainWithMapFragment();
-                    } else {
-                        fragment = new MainFragment();
-                    }
+                    fragment = new MainFragment();
                     mMainFragment = fragment;
                 }
                 break;
@@ -308,16 +341,58 @@ public class MainActivity extends ActionBarActivity
         return mCurrentSection;
     }
 
-    public void setMapVisibility(int visibility) {
-        if(mMapView != null && mMapView.getVisibility() != visibility) {
-            mMapView.setVisibility(visibility);
-        }
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if(mMapView != null)
+            mMapView.onPause();
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = mMapFragment.getMap();
+    public void onLowMemory() {
+        super.onLowMemory();
 
+        if(mMapView != null)
+            mMapView.onLowMemory();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if(mMapView != null)
+            mMapView.onDestroy();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle b) {
+        super.onSaveInstanceState(b);
+
+        if(mMapView != null)
+            mMapView.onSaveInstanceState(b);
+
+        // Do your save instance
+    }
+
+    /**
+     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
+     * installed) and the map has not already been instantiated.. This will ensure that we only ever
+     * call {@link #setUpMap()} once when {@link #mMap} is not null.
+     */
+    private void setUpMapIfNeeded() {
+        // Do a null check to confirm that we have not already instantiated the map.
+        if (mMapView!= null && mMap == null) {
+
+            mMap = mMapView.getMap();
+
+            if(mMap != null) {
+                setUpMap();
+            }
+        }
+    }
+
+    private void setUpMap() {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Location location = locationManager
                 .getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -330,5 +405,98 @@ public class MainActivity extends ActionBarActivity
 
         mMap.moveCamera(center);
         mMap.animateCamera(zoom);
+    }
+
+    /**
+     * Draggable screen divider touch listener
+     */
+    @Override
+    public boolean onTouch(View view, MotionEvent event) {
+
+        final int Y = (int) event.getRawY();
+        LinearLayout.LayoutParams params1 = (LinearLayout.LayoutParams) mContainer.getLayoutParams();
+        LinearLayout.LayoutParams params2 = (LinearLayout.LayoutParams) mMapSegment.getLayoutParams();
+
+        int delta = 0;
+
+        switch (event.getAction() & MotionEvent.ACTION_MASK) {
+            case MotionEvent.ACTION_DOWN:
+                view.setBackgroundColor(0xff555555);
+                // save starting position
+                mDividerTop = Y;
+
+                // calculate weight factor
+                if (params1.weight > 0) {
+                    mWeightFactor = params1.weight / (mHeight - Y);
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                view.setBackgroundColor(0xffeeeeee);
+                break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                break;
+            case MotionEvent.ACTION_POINTER_UP:
+                break;
+            case MotionEvent.ACTION_MOVE:
+                // delta against previous position
+                delta = Y - mDividerTop;
+
+                if (delta > 0 && (params1.weight / mWeightFactor <= 40 ||
+                    params1.weight / mWeightFactor <= delta)) {
+                    switchView(0, true);
+                } else if(delta < 0 && (params2.weight < 0.09 ||
+                        params2.weight <= -1 * delta * mWeightFactor)) {
+                    switchView(1, true);
+                } else {
+                    // adjust the weights
+                    params1.weight = params1.weight - delta * mWeightFactor;
+                    params2.weight = 1 - params1.weight;
+                    mContainer.setLayoutParams(params1);
+                    mMapSegment.setLayoutParams(params2);
+
+                    // save new position
+                    mDividerTop = Y;
+                }
+                break;
+        }
+
+        mBottomWeight = params1.weight;
+        return true;
+    }
+
+    public float getBottomWeight() {
+        return mBottomWeight;
+    }
+
+    public boolean dividerVisible() {
+        return mDivider.getHeight() > 0;
+    }
+
+    public void makeDividerVisibile(boolean v) {
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mDivider.getLayoutParams();
+        if(v) {
+            params.height = 20;
+        } else {
+            params.height = 0;
+        }
+        mDivider.setLayoutParams(params);
+    }
+
+    public void switchView(float bottomWeight, boolean showDivider) {
+        if(showDivider && !dividerVisible()) {
+            makeDividerVisibile(true);
+        } else if(!showDivider && dividerVisible()) {
+            makeDividerVisibile(false);
+        }
+
+        LinearLayout.LayoutParams params1 = (LinearLayout.LayoutParams) mContainer.getLayoutParams();
+        LinearLayout.LayoutParams params2 = (LinearLayout.LayoutParams) mMapSegment.getLayoutParams();
+
+        params1.weight = bottomWeight;
+        params2.weight = 1 - bottomWeight;
+
+        mWeightFactor = 0.003f;
+        mContainer.setLayoutParams(params1);
+        mMapSegment.setLayoutParams(params2);
     }
 }

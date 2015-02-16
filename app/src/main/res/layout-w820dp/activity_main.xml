@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">  <!-- TODO: ?? maybe needs to go to drawer_layer -->
+    tools:context=".MainActivity"
+    android:background="@android:color/white" >  <!-- TODO: ?? maybe needs to go to drawer_layer -->
 
     <android.support.v4.widget.DrawerLayout android:id="@+id/drawer_layout"
         android:layout_width="match_parent" android:layout_height="match_parent" >

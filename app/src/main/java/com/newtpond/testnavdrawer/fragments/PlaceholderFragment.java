@@ -60,8 +60,11 @@ public class PlaceholderFragment extends Fragment {
     @Override
     public void onResume() {
         super.onStart();
-        // TODO: uncomment this to hide map
-        //((MainActivity) getActivity()).setMapVisibility(View.INVISIBLE);
+
+        // hide map and divider
+        if (((MainActivity)getActivity()).dividerVisible()) {
+            ((MainActivity) getActivity()).switchView(1, false);
+        }
     }
 
 }

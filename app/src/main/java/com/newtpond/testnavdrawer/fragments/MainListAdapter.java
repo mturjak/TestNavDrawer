@@ -8,7 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 
-import com.newtpond.testnavdrawer.MainActivity;
 import com.newtpond.testnavdrawer.R;
 
 import java.util.ArrayList;
@@ -24,10 +23,8 @@ final class MainListAdapter extends BaseAdapter implements Filterable {
     private final LayoutInflater mLayoutInflater;
     private List<DummyContent.DummyItem> mItems = Collections.emptyList();
     private int mAvatarImageViewPixelSize;
-    private boolean mWithMap = false;
 
-    public MainListAdapter(Context context, boolean withMap) {
-        mWithMap = withMap;
+    public MainListAdapter(Context context) {
         mContext = context;
         mAvatarImageViewPixelSize = context.getResources().getDimensionPixelSize(R.dimen.user_profile_img_size);
         mLayoutInflater = LayoutInflater.from(context);
@@ -57,20 +54,14 @@ final class MainListAdapter extends BaseAdapter implements Filterable {
     // this needs to be set to the number of different row layout types
     @Override
     public int getViewTypeCount() {
-        return 4;
+        return 2;
     }
 
     // this must return int from 0 to getViewTypeCount-1
     @Override
     public int getItemViewType(int position) {
         DummyContent.DummyItem item = mItems.get(position);
-        if(mWithMap && position == 0) {
-            if(item.getType() == 1) {
-                return 2;
-            } else {
-                return 3;
-            }
-        } else if(item.getType() == 1) {
+        if(item.getType() == 1) {
             return 0;
         }
         return 1;
@@ -130,12 +121,6 @@ final class MainListAdapter extends BaseAdapter implements Filterable {
 
         if (convertView == null) {
             switch (type) {
-                case 3:
-                    convertView = mLayoutInflater.inflate(R.layout.moment_list_item_w_map, null);
-                    break;
-                case 2:
-                    convertView = mLayoutInflater.inflate(R.layout.grab_list_item_w_map, null);
-                    break;
                 case 1:
                     convertView = mLayoutInflater.inflate(R.layout.moment_list_item, null);
                     break;
@@ -143,17 +128,6 @@ final class MainListAdapter extends BaseAdapter implements Filterable {
                     convertView = mLayoutInflater.inflate(R.layout.grab_list_item, null);
                     break;
             }
-        }
-
-        if(type > 1) {
-            convertView.findViewById(R.id.map_spacer).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(mContext instanceof MainActivity){
-                        ((MainActivity)mContext).editUser();
-                    }
-                }
-            });
         }
 
         return convertView;
