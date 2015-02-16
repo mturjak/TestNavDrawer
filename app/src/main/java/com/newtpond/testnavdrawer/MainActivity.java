@@ -3,6 +3,7 @@ package com.newtpond.testnavdrawer;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -52,6 +53,12 @@ import static com.newtpond.testnavdrawer.utils.NetworkAvailable.noNetworkAlert;
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks, View.OnTouchListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
+
+    public static final String TAG = MainActivity.class.getSimpleName();
+
+    /**
+     * Navigation drawer properties
+     */
     private boolean mIsDrawerLocked = false;
     private DrawerLayout mDrawerLayout;
 
@@ -66,7 +73,7 @@ public class MainActivity extends ActionBarActivity
     private CharSequence mTitle;
 
     /**
-     * Section fragments
+     * Section fragments and current section position
      */
     private int mCurrentSection = -1;
     private Fragment mMainFragment;
@@ -74,23 +81,35 @@ public class MainActivity extends ActionBarActivity
     private Fragment mMomentFragment;
     private Fragment mFriendsFragment;
 
+    /**
+     * Google API Client properties
+     */
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
     private String mLastUpdateTime;
 
-    private final String REQUESTING_LOCATION_UPDATES_KEY = "request_location_updates";
-    private final String LOCATION_KEY = "last_location";
-    private final String LAST_UPDATED_TIME_STRING_KEY = "last_updated_time";
+    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+    private final static String REQUESTING_LOCATION_UPDATES_KEY = "request_location_updates";
+    private final static String LOCATION_KEY = "last_location";
+    private final static String LAST_UPDATED_TIME_STRING_KEY = "last_updated_time";
 
-    private boolean mRequestingLocationUpdates = true;
+    // switch for turning location updating on or off
+    private boolean mRequestingLocationUpdates = false;
 
+    /**
+     * Google Map properties
+     */
     private MapView mMapView;
     private GoogleMap mMap;
 
+    /**
+     * properties related to Map/List view
+     * with draggable divider
+     */
     private FrameLayout mContainer;
-    private RelativeLayout mDivider;
     private FrameLayout mMapSegment;
+    private RelativeLayout mDivider;
     private float mWeightFactor = 0;
     private float mBottomWeight = 0.7f;
     private int mDividerTop;
@@ -101,36 +120,7 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        updateValuesFromBundle(savedInstanceState);
-
-        if(mGoogleApiClient == null) {
-            buildGoogleApiClient();
-        }
-
-        createLocationRequest();
-
-        if (findViewById(R.id.main_list_map) != null) {
-            mMapView = (MapView) findViewById(R.id.main_list_map);
-            mMapView.onCreate(savedInstanceState);
-
-            mContainer = (FrameLayout)findViewById(R.id.container);
-            mDivider = (RelativeLayout)findViewById(R.id.layout_draggable);
-            mMapSegment= (FrameLayout)findViewById(R.id.map_segment);
-
-            mDivider.setOnTouchListener(this);
-
-            if(mMap == null) {
-                MapsInitializer.initialize(this);
-            }
-
-            //mMap = mMapView.getMap();
-
-            /*mMapFragment = (SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.main_list_map);
-
-            mMapFragment.getMapAsync(this);*/
-        }
-
+        // get current user
         ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser != null) {
             // do stuff with the user
@@ -142,6 +132,36 @@ public class MainActivity extends ActionBarActivity
             }
         } else {
             navigateTo(LoginActivity.class, true);
+        }
+
+        // method loads saved Google api values
+        updateValuesFromBundle(savedInstanceState);
+
+        // builds the client if necessary
+        if(mGoogleApiClient == null) {
+            buildGoogleApiClient();
+        }
+
+        // builds location request
+        createLocationRequest();
+
+        // checking if layout includes a map view
+        if (findViewById(R.id.main_list_map) != null) {
+            mMapView = (MapView) findViewById(R.id.main_list_map);
+            mMapView.onCreate(savedInstanceState);
+
+            // get elements of the divided layout
+            mContainer = (FrameLayout)findViewById(R.id.container);
+            mDivider = (RelativeLayout)findViewById(R.id.layout_draggable);
+            mMapSegment= (FrameLayout)findViewById(R.id.map_segment);
+
+            // make divider draggable
+            mDivider.setOnTouchListener(this);
+
+            // because using MapView instead of fragment we may need to initialize maps manually
+            if(mMap == null) {
+                MapsInitializer.initialize(this);
+            }
         }
 
         mTitle = getTitle();
@@ -166,9 +186,11 @@ public class MainActivity extends ActionBarActivity
     protected void onResume() {
         super.onResume();
 
+        // connect Google API client
         if(!mGoogleApiClient.isConnected())
             mGoogleApiClient.connect();
 
+        // if client connected and location updates
         if (mGoogleApiClient.isConnected() && !mRequestingLocationUpdates) {
             startLocationUpdates();
         }
@@ -177,8 +199,11 @@ public class MainActivity extends ActionBarActivity
             mMapView.onResume();
 
         if(mDivider != null) {
+            //
             DisplayMetrics displaymetrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+            // TODO: convert pixels to dp to be on the safe side
+            // int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, <HEIGHT>, getResources().getDisplayMetrics());
             mHeight = displaymetrics.heightPixels;
 
             Log.e("height", "" + mHeight);
@@ -384,7 +409,7 @@ public class MainActivity extends ActionBarActivity
             mMapView.onPause();
 
         if (mGoogleApiClient.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            stopLocationUpdates();
             mGoogleApiClient.disconnect();
         }
     }
@@ -407,24 +432,24 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     protected void onSaveInstanceState(Bundle b) {
-
-        if(mMapView != null)
-            mMapView.onSaveInstanceState(b);
-
+        // google API client location values
         b.putBoolean(REQUESTING_LOCATION_UPDATES_KEY,
-            mRequestingLocationUpdates);
-
+                mRequestingLocationUpdates);
         b.putParcelable(LOCATION_KEY, mLastLocation);
         b.putString(LAST_UPDATED_TIME_STRING_KEY, mLastUpdateTime);
 
+        // call super
         super.onSaveInstanceState(b);
 
+        // attach MapView onSaveInstance method
+        if(mMapView != null)
+            mMapView.onSaveInstanceState(b);
     }
 
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
      * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
+     * call {@link /setUpMap()} once when {@link /mMap} is not null.
      */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
@@ -439,15 +464,12 @@ public class MainActivity extends ActionBarActivity
     }
 
     private void setUpMap() {
-        /*LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Location location = locationManager
-                .getLastKnownLocation(LocationManager.GPS_PROVIDER);*/
-
         if (mLastLocation != null) {
             double lat = mLastLocation.getLatitude();
             double lng = mLastLocation.getLongitude();
             LatLng coordinate = new LatLng(lat, lng);
 
+            // marker options for current position
             MarkerOptions options = new MarkerOptions()
                     .position(coordinate)
                     .title("I am here!");
@@ -455,8 +477,8 @@ public class MainActivity extends ActionBarActivity
             CameraUpdate center = CameraUpdateFactory.newLatLng(coordinate);
             CameraUpdate zoom = CameraUpdateFactory.zoomTo(13);
 
+            // set up map
             mMap.addMarker(options);
-
             mMap.moveCamera(center);
             mMap.animateCamera(zoom);
         }
@@ -469,48 +491,63 @@ public class MainActivity extends ActionBarActivity
      *
      *
      */
+
+    /**
+     * Google API client builder
+     */
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-
-        Log.e("googleApi", mGoogleApiClient.toString());
     }
-
+    /**
+     * Create the LocationRequest object
+     */
     protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest = new LocationRequest()
+            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+            .setInterval(10 * 1000) // 10 seconds
+            .setFastestInterval(1000); // 1 second
     }
 
+    /**
+     * onConnected callback for the Google API client
+     */
     @Override
     public void onConnected(Bundle bundle) {
+        Log.i(TAG, "Location services connected.");
+
+        // get last location
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
 
+        // if last location empty start location updating
         if(mLastLocation == null) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+
+            startLocationUpdates();
         }
         else {
+            // handle retrieved location
             setUpMap();
         }
 
     }
 
+    /**
+     * Starts location updating using location request
+     */
     protected void startLocationUpdates() {
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 mGoogleApiClient, mLocationRequest, this);
     }
 
     // called from onPause method
-    /*protected void stopLocationUpdates() {
+    protected void stopLocationUpdates() {
         LocationServices.FusedLocationApi.removeLocationUpdates(
                 mGoogleApiClient, this);
-    }*/
-    // we disconected the client instead onPause
+    }
 
     private void updateValuesFromBundle(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
@@ -540,12 +577,22 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.e("GoogleApi","connection suspended");
+        Log.i(TAG, "Location services suspended. Please reconnect.");
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.e("GoogleApi","connection failed");
+        if (connectionResult.hasResolution()) {
+            try {
+                // Start an Activity that tries to resolve the error
+                connectionResult.startResolutionForResult(this, CONNECTION_FAILURE_RESOLUTION_REQUEST);
+            } catch (IntentSender.SendIntentException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.i(TAG, "Location services connection failed with code " + connectionResult.getErrorCode());
+        }
     }
 
     @Override

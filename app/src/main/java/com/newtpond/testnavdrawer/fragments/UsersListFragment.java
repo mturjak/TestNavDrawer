@@ -71,11 +71,12 @@ public class UsersListFragment extends ListFragment {
                 if (e == null) {
                     mFriends = friends;
 
+                    // TODO: make sure we a list view ... got error
+                    // thrown E/AndroidRuntime﹕ FATAL EXCEPTION: main java.lang.IllegalStateException: Content view not yet created
                     GravatarAdapter adapter = new GravatarAdapter(getListView().getContext(), "item");
                     adapter.updateUsers(mFriends);
 
                     setListAdapter(adapter);
-
 
                 } else {
                     Log.e(TAG, e.getMessage());
