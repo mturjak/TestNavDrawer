@@ -615,7 +615,7 @@ public class MainActivity extends ActionBarActivity
         LinearLayout.LayoutParams params1 = (LinearLayout.LayoutParams) mContainer.getLayoutParams();
         LinearLayout.LayoutParams params2 = (LinearLayout.LayoutParams) mMapSegment.getLayoutParams();
 
-        int delta = 0;
+        int delta;
 
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
@@ -667,10 +667,7 @@ public class MainActivity extends ActionBarActivity
     }
 
     public boolean dividerVisible() {
-        if(mDivider != null)
-            return mDivider.getHeight() > 0;
-
-        return true;
+        return mDivider == null || mDivider.getHeight() > 0;
     }
 
     public void makeDividerVisibile(boolean v) {
