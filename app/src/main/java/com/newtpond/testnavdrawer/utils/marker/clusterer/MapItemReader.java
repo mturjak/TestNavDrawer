@@ -1,4 +1,4 @@
-package com.newtpond.testnavdrawer.utils;
+package com.newtpond.testnavdrawer.utils.marker.clusterer;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -8,8 +8,6 @@ import java.util.Scanner;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.newtpond.testnavdrawer.widget.MapClusterItem;
 
 public class MapItemReader {
 

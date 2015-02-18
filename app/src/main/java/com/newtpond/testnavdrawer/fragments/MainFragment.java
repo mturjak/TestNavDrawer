@@ -1,11 +1,9 @@
 package com.newtpond.testnavdrawer.fragments;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,6 +83,10 @@ public class MainFragment extends Fragment {
         mainList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                // get item geo point from position and set map center
+                ((MainActivity)getActivity()).centerMap(51.525579,-0.082841);
+
+                /*
                 if(mTwoPane) {
                     Fragment fragment = getFragment(position);
 
@@ -102,6 +104,7 @@ public class MainFragment extends Fragment {
                     detailIntent.putExtra(MainDetailFragment.ARG_ITEM_ID, position);
                     startActivity(detailIntent);
                 }
+                */
             }
         });
 

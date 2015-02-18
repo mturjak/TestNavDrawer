@@ -2,6 +2,9 @@ package com.newtpond.testnavdrawer;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
@@ -9,6 +12,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -36,6 +41,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 import com.newtpond.testnavdrawer.fragments.EditProfileActivity;
@@ -43,8 +49,9 @@ import com.newtpond.testnavdrawer.fragments.EditProfileFragment;
 import com.newtpond.testnavdrawer.fragments.MainFragment;
 import com.newtpond.testnavdrawer.fragments.PlaceholderFragment;
 import com.newtpond.testnavdrawer.fragments.UsersListFragment;
-import com.newtpond.testnavdrawer.utils.MapItemReader;
-import com.newtpond.testnavdrawer.widget.MapClusterItem;
+import com.newtpond.testnavdrawer.utils.marker.clusterer.MapItemReader;
+import com.newtpond.testnavdrawer.utils.marker.clusterer.MapClusterItem;
+import com.newtpond.testnavdrawer.utils.marker.clusterer.MyClusterRenderer;
 import com.parse.ParseUser;
 
 import org.json.JSONException;
@@ -530,6 +537,34 @@ public class MainActivity extends ActionBarActivity
     public void onConnected(Bundle bundle) {
         Log.i(TAG, "Location services connected.");
 
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_price_tag_green)
+                        .setContentTitle("My notification")
+                        .setContentText("Hello World!");
+// Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(this, EditProfileActivity.class);
+
+// The stack builder object will contain an artificial back stack for the
+// started Activity.
+// This ensures that navigating backward from the Activity leads out of
+// your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+// Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(EditProfileActivity.class);
+// Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+// mId allows you to update the notification later on.
+        mNotificationManager.notify(1, mBuilder.build());
+
         // get last location
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
@@ -717,19 +752,32 @@ public class MainActivity extends ActionBarActivity
      * Map Marker Clusterer
      */
     private void setUpClusterer() {
-        if (mMapView != null) {
+        if (mMapView != null && mClusterManager == null) { // TODO: only add cluster manager if required
 
             // Position the map.
-            mMapView.getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.503186, -0.126446), 10));
-
             // Initialize the manager with the context and the map.
             // (Activity extends context, so we can pass 'this' in the constructor.)
             mClusterManager = new ClusterManager<MapClusterItem>(this, mMapView.getMap());
+            mClusterManager.setRenderer(new MyClusterRenderer(this.getApplicationContext(), mMapView.getMap(), mClusterManager));
 
             // Point the map's listeners at the listeners implemented by the cluster
             // manager.
             mMapView.getMap().setOnCameraChangeListener(mClusterManager);
             mMapView.getMap().setOnMarkerClickListener(mClusterManager);
+
+            mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MapClusterItem>() {
+                @Override
+                public boolean onClusterItemClick(MapClusterItem mapClusterItem) {
+                    //mMapView.getMap().moveCamera(CameraUpdateFactory.newLatLng(mapClusterItem.getPosition()));
+                    mMapView.getMap().animateCamera(CameraUpdateFactory.newLatLng(mapClusterItem.getPosition()), 300, null);
+                    Toast.makeText(MainActivity.this, mapClusterItem.getTitle(), Toast.LENGTH_SHORT).show();// display toast
+                    ListView itemList = (ListView) mContainer.findViewById(android.R.id.list);
+
+                    itemList.setItemChecked(4, true);
+                    itemList.setSelection(4); //smoothScrollToPosition(4);
+                    return true;
+                }
+            });
 
             // Add cluster items (markers) to the cluster manager.
             try {
@@ -744,5 +792,9 @@ public class MainActivity extends ActionBarActivity
         InputStream inputStream = getResources().openRawResource(R.raw.radar_search);
         List<MapClusterItem> items = new MapItemReader().read(inputStream);
         mClusterManager.addItems(items);
+    }
+
+    public void centerMap(double lat, double lon) {
+        mMapView.getMap().animateCamera(CameraUpdateFactory.newLatLng(new LatLng(lat,lon)), 380, null);
     }
 }
