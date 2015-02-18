@@ -23,6 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -36,15 +37,22 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
 import com.newtpond.testnavdrawer.fragments.EditProfileActivity;
 import com.newtpond.testnavdrawer.fragments.EditProfileFragment;
 import com.newtpond.testnavdrawer.fragments.MainFragment;
 import com.newtpond.testnavdrawer.fragments.PlaceholderFragment;
 import com.newtpond.testnavdrawer.fragments.UsersListFragment;
+import com.newtpond.testnavdrawer.utils.MapItemReader;
+import com.newtpond.testnavdrawer.widget.MapClusterItem;
 import com.parse.ParseUser;
 
+import org.json.JSONException;
+
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 
 import static com.newtpond.testnavdrawer.utils.NetworkAvailable.isNetworkAvailable;
 import static com.newtpond.testnavdrawer.utils.NetworkAvailable.noNetworkAlert;
@@ -102,6 +110,7 @@ public class MainActivity extends ActionBarActivity
      */
     private MapView mMapView;
     private GoogleMap mMap;
+    private ClusterManager<MapClusterItem> mClusterManager;
 
     /**
      * properties related to Map/List view
@@ -478,9 +487,11 @@ public class MainActivity extends ActionBarActivity
             CameraUpdate zoom = CameraUpdateFactory.zoomTo(13);
 
             // set up map
-            mMap.addMarker(options);
-            mMap.moveCamera(center);
-            mMap.animateCamera(zoom);
+            //mMap.addMarker(options);
+            //mMap.moveCamera(center);
+            //mMap.animateCamera(zoom);
+
+            setUpClusterer();
         }
     }
 
@@ -700,5 +711,38 @@ public class MainActivity extends ActionBarActivity
             mContainer.setLayoutParams(params1);
             mMapSegment.setLayoutParams(params2);
         }
+    }
+
+    /**
+     * Map Marker Clusterer
+     */
+    private void setUpClusterer() {
+        if (mMapView != null) {
+
+            // Position the map.
+            mMapView.getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.503186, -0.126446), 10));
+
+            // Initialize the manager with the context and the map.
+            // (Activity extends context, so we can pass 'this' in the constructor.)
+            mClusterManager = new ClusterManager<MapClusterItem>(this, mMapView.getMap());
+
+            // Point the map's listeners at the listeners implemented by the cluster
+            // manager.
+            mMapView.getMap().setOnCameraChangeListener(mClusterManager);
+            mMapView.getMap().setOnMarkerClickListener(mClusterManager);
+
+            // Add cluster items (markers) to the cluster manager.
+            try {
+                readItems();
+            } catch (JSONException e) {
+                Toast.makeText(this, "Problem reading list of markers.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private void readItems() throws JSONException {
+        InputStream inputStream = getResources().openRawResource(R.raw.radar_search);
+        List<MapClusterItem> items = new MapItemReader().read(inputStream);
+        mClusterManager.addItems(items);
     }
 }
