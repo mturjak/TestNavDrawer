@@ -16,11 +16,14 @@ import com.newtpond.testnavdrawer.MainActivity;
 import com.newtpond.testnavdrawer.R;
 import com.newtpond.testnavdrawer.utils.ParseConstants;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,9 +33,10 @@ public class UsersListFragment extends ListFragment {
 
     public static final String TAG = UsersListFragment.class.getSimpleName();
 
-    protected List<ParseUser> mFriends;
+    protected List<ParseObject> mFriends;
     protected ParseRelation<ParseUser> mFriendsRelation;
     protected ParseUser mCurrentUser;
+    protected ParseObject mCurrentProfile;
 
     private static final String ARG_SECTION_NUMBER = "section_id";
 
@@ -52,11 +56,31 @@ public class UsersListFragment extends ListFragment {
         super.onResume();
 
         // hide map and divider
-        if (((MainActivity)getActivity()).dividerVisible()) {
-            ((MainActivity) getActivity()).switchView(1, false);
-        }
+        //if (((MainActivity)getActivity()).dividerVisible()) {
+        ((MainActivity) getActivity()).switchView(1, false);
+        //}
 
         mCurrentUser = ParseUser.getCurrentUser();
+
+        mCurrentUser.getParseObject("profile")
+                .fetchIfNeededInBackground(new GetCallback<ParseObject>() {
+                    public void done(ParseObject profile, ParseException e) {
+                        mCurrentProfile = profile;
+                        // Do something with your new title variable
+
+                        // TODO: grab relations instead of showing self
+                        mFriends = new ArrayList<ParseObject>();
+                        mFriends.add(profile);
+
+                        // to be done with relations
+                        GravatarAdapter adapter = new GravatarAdapter(getListView().getContext(), "item");
+                        adapter.updateUsers(mFriends);
+
+                        setListAdapter(adapter);
+                    }
+                });
+
+        /*
         mFriendsRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
 
         //((ActionBarActivity)getActivity()).setSupportProgressBarIndeterminateVisibility(true);
@@ -89,6 +113,7 @@ public class UsersListFragment extends ListFragment {
                 }
             }
         });
+        */
     }
 
     @Override
@@ -98,6 +123,8 @@ public class UsersListFragment extends ListFragment {
                 getArguments().getInt(ARG_SECTION_NUMBER));
     }
 
+    // TODO: show profile
+    /*
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -106,4 +133,5 @@ public class UsersListFragment extends ListFragment {
         intent.putExtra(ParseConstants.KEY_USERNAME, mFriends.get(position).getUsername());
         startActivity(intent);
     }
+    */
 }

@@ -2,9 +2,6 @@ package com.newtpond.testnavdrawer;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
@@ -12,8 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -41,7 +36,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 import com.newtpond.testnavdrawer.fragments.EditProfileActivity;
@@ -49,8 +43,8 @@ import com.newtpond.testnavdrawer.fragments.EditProfileFragment;
 import com.newtpond.testnavdrawer.fragments.MainFragment;
 import com.newtpond.testnavdrawer.fragments.PlaceholderFragment;
 import com.newtpond.testnavdrawer.fragments.UsersListFragment;
-import com.newtpond.testnavdrawer.utils.marker.clusterer.MapItemReader;
 import com.newtpond.testnavdrawer.utils.marker.clusterer.MapClusterItem;
+import com.newtpond.testnavdrawer.utils.marker.clusterer.MapItemReader;
 import com.newtpond.testnavdrawer.utils.marker.clusterer.MyClusterRenderer;
 import com.parse.ParseUser;
 
@@ -104,10 +98,14 @@ public class MainActivity extends ActionBarActivity
     private LocationRequest mLocationRequest;
     private String mLastUpdateTime;
 
+    // keys
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     private final static String REQUESTING_LOCATION_UPDATES_KEY = "request_location_updates";
     private final static String LOCATION_KEY = "last_location";
     private final static String LAST_UPDATED_TIME_STRING_KEY = "last_updated_time";
+    private final static String BOTTOM_WEIGHT_STRING_KEY = "bottom_weight";
+    private final static String CURRENT_SECTION_KEY = "current_section";
+    private static final String MAP_MARKERS = "stored_map_markers";
 
     // switch for turning location updating on or off
     private boolean mRequestingLocationUpdates = false;
@@ -118,6 +116,7 @@ public class MainActivity extends ActionBarActivity
     private MapView mMapView;
     private GoogleMap mMap;
     private ClusterManager<MapClusterItem> mClusterManager;
+    private boolean mRepositionMap = true;
 
     /**
      * properties related to Map/List view
@@ -178,6 +177,7 @@ public class MainActivity extends ActionBarActivity
             if(mMap == null) {
                 MapsInitializer.initialize(this);
             }
+
         }
 
         mTitle = getTitle();
@@ -207,22 +207,27 @@ public class MainActivity extends ActionBarActivity
             mGoogleApiClient.connect();
 
         // if client connected and location updates
-        if (mGoogleApiClient.isConnected() && !mRequestingLocationUpdates) {
+        if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
             startLocationUpdates();
         }
 
         if(mMapView != null)
             mMapView.onResume();
 
+        if(mBottomWeight != 0.7f) {
+            // this means the map was retrieved from saved state, so we will not reposition it
+            mRepositionMap = false;
+
+            if(mCurrentSection < 3)
+                switchView(mBottomWeight, true);
+        }
+
         if(mDivider != null) {
-            //
             DisplayMetrics displaymetrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
             // TODO: convert pixels to dp to be on the safe side
             // int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, <HEIGHT>, getResources().getDisplayMetrics());
             mHeight = displaymetrics.heightPixels;
-
-            Log.e("height", "" + mHeight);
         }
 
         setUpMapIfNeeded();
@@ -453,6 +458,8 @@ public class MainActivity extends ActionBarActivity
                 mRequestingLocationUpdates);
         b.putParcelable(LOCATION_KEY, mLastLocation);
         b.putString(LAST_UPDATED_TIME_STRING_KEY, mLastUpdateTime);
+        b.putFloat(BOTTOM_WEIGHT_STRING_KEY, mBottomWeight);
+        b.putInt(CURRENT_SECTION_KEY, mCurrentSection);
 
         // call super
         super.onSaveInstanceState(b);
@@ -475,6 +482,8 @@ public class MainActivity extends ActionBarActivity
 
             if(mMap != null) {
                 setUpMap();
+            } else {
+                switchView(1, false);
             }
         }
     }
@@ -498,7 +507,7 @@ public class MainActivity extends ActionBarActivity
             //mMap.moveCamera(center);
             //mMap.animateCamera(zoom);
 
-            setUpClusterer();
+            setUpClusterer(mRepositionMap);
         }
     }
 
@@ -537,6 +546,8 @@ public class MainActivity extends ActionBarActivity
     public void onConnected(Bundle bundle) {
         Log.i(TAG, "Location services connected.");
 
+        /* TODO: integrate this notifications in a useful place =)
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_price_tag_green)
@@ -564,6 +575,8 @@ public class MainActivity extends ActionBarActivity
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 // mId allows you to update the notification later on.
         mNotificationManager.notify(1, mBuilder.build());
+
+        */
 
         // get last location
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
@@ -595,6 +608,10 @@ public class MainActivity extends ActionBarActivity
                 mGoogleApiClient, this);
     }
 
+    /**
+     * Stored data retrieval
+     * @param savedInstanceState
+     */
     private void updateValuesFromBundle(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             // Update the value of mRequestingLocationUpdates from the Bundle, and
@@ -618,6 +635,19 @@ public class MainActivity extends ActionBarActivity
                 mLastUpdateTime = savedInstanceState.getString(
                         LAST_UPDATED_TIME_STRING_KEY);
             }
+
+            /**
+             * I added this for to retain the divider state
+             */
+            if (savedInstanceState.keySet().contains(BOTTOM_WEIGHT_STRING_KEY)) {
+                mBottomWeight = savedInstanceState.getFloat(
+                        BOTTOM_WEIGHT_STRING_KEY);
+            }
+            if (savedInstanceState.keySet().contains(CURRENT_SECTION_KEY)) {
+                mCurrentSection = savedInstanceState.getInt(
+                        CURRENT_SECTION_KEY);
+            }
+            // TODO: use local storage also for markers
         }
     }
 
@@ -637,6 +667,7 @@ public class MainActivity extends ActionBarActivity
                 e.printStackTrace();
             }
         } else {
+            switchView(1,false);
             Log.i(TAG, "Location services connection failed with code " + connectionResult.getErrorCode());
         }
     }
@@ -729,10 +760,14 @@ public class MainActivity extends ActionBarActivity
     }
 
     public void switchView(float bottomWeight, boolean showDivider) {
+        if(mMap == null) {
+            bottomWeight = 1;
+            showDivider = false;
+        }
         if(mDivider != null) {
             if (showDivider && !dividerVisible()) {
                 makeDividerVisibile(true);
-            } else if (!showDivider && dividerVisible()) {
+            } else if (!showDivider) {
                 makeDividerVisibile(false);
             }
 
@@ -751,10 +786,13 @@ public class MainActivity extends ActionBarActivity
     /**
      * Map Marker Clusterer
      */
-    private void setUpClusterer() {
-        if (mMapView != null && mClusterManager == null) { // TODO: only add cluster manager if required
+    private void setUpClusterer(boolean reposition) {
+        if (mMap != null && mClusterManager == null) { // TODO: only add cluster manager if required
 
             // Position the map.
+            if(reposition)
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.503186, -0.126446), 12));
+
             // Initialize the manager with the context and the map.
             // (Activity extends context, so we can pass 'this' in the constructor.)
             mClusterManager = new ClusterManager<MapClusterItem>(this, mMapView.getMap());
@@ -762,14 +800,14 @@ public class MainActivity extends ActionBarActivity
 
             // Point the map's listeners at the listeners implemented by the cluster
             // manager.
-            mMapView.getMap().setOnCameraChangeListener(mClusterManager);
-            mMapView.getMap().setOnMarkerClickListener(mClusterManager);
+            mMap.setOnCameraChangeListener(mClusterManager);
+            mMap.setOnMarkerClickListener(mClusterManager);
 
             mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MapClusterItem>() {
                 @Override
                 public boolean onClusterItemClick(MapClusterItem mapClusterItem) {
                     //mMapView.getMap().moveCamera(CameraUpdateFactory.newLatLng(mapClusterItem.getPosition()));
-                    mMapView.getMap().animateCamera(CameraUpdateFactory.newLatLng(mapClusterItem.getPosition()), 300, null);
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(mapClusterItem.getPosition()), 300, null);
                     Toast.makeText(MainActivity.this, mapClusterItem.getTitle(), Toast.LENGTH_SHORT).show();// display toast
                     ListView itemList = (ListView) mContainer.findViewById(android.R.id.list);
 
@@ -795,6 +833,7 @@ public class MainActivity extends ActionBarActivity
     }
 
     public void centerMap(double lat, double lon) {
-        mMapView.getMap().animateCamera(CameraUpdateFactory.newLatLng(new LatLng(lat,lon)), 380, null);
+        if(mMap != null)
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(lat,lon)), 380, null);
     }
 }

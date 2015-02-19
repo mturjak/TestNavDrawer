@@ -62,9 +62,7 @@ public class PlaceholderFragment extends Fragment {
         super.onStart();
 
         // hide map and divider
-        if (((MainActivity)getActivity()).dividerVisible()) {
-            ((MainActivity) getActivity()).switchView(1, false);
-        }
+        ((MainActivity) getActivity()).switchView(1, false);
     }
 
 }

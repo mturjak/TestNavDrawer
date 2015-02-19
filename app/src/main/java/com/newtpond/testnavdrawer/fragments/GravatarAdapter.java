@@ -10,21 +10,19 @@ import android.widget.TextView;
 
 import com.makeramen.RoundedTransformationBuilder;
 import com.newtpond.testnavdrawer.R;
-import com.parse.ParseUser;
+import com.parse.ParseObject;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
 import java.util.Collections;
 import java.util.List;
 
-import fr.tkeunebr.gravatar.Gravatar;
-
 final class GravatarAdapter extends BaseAdapter {
   private final String mStyle;
   private final Context mContext;
   private final LayoutInflater mLayoutInflater;
   private final int mAvatarImageViewPixelSize;
-  private List<ParseUser> mUsers = Collections.emptyList();
+  private List<ParseObject> mProfiles = Collections.emptyList();
 
   public GravatarAdapter(Context context, String style) {
     mContext = context;
@@ -33,19 +31,19 @@ final class GravatarAdapter extends BaseAdapter {
     mAvatarImageViewPixelSize = context.getResources().getDimensionPixelSize(R.dimen.avatar_image_view_size);
   }
 
-  public void updateUsers(List<ParseUser> users) {
-    mUsers = users;
+  public void updateUsers(List<ParseObject> profiles) {
+    mProfiles = profiles;
     notifyDataSetChanged();
   }
 
   @Override
   public int getCount() {
-    return mUsers.size();
+    return mProfiles.size();
   }
 
   @Override
-  public ParseUser getItem(int position) {
-    return mUsers.get(position);
+  public ParseObject getItem(int position) {
+    return mProfiles.get(position);
   }
 
   @Override
@@ -63,13 +61,18 @@ final class GravatarAdapter extends BaseAdapter {
         }
     }
 
-    ParseUser user = getItem(position);
+    ParseObject profile = getItem(position);
 
-    String gravatarUrl = Gravatar.init()
+    /*String gravatarUrl = Gravatar.init()
             .with(user.getEmail())
             .force404()
             .size(mAvatarImageViewPixelSize)
-            .build();
+            .build();*/
+
+    String gravatarUrl = "http://www.gravatar.com/avatar/"
+            + profile.getString("") /* use emailHash from profile */
+            + "?s=" + mAvatarImageViewPixelSize /* set avatar size */
+            + "&d=404" /* force 404 */;
 
     Transformation transformation = new RoundedTransformationBuilder()
             .cornerRadiusDp(mAvatarImageViewPixelSize/2)
@@ -83,7 +86,7 @@ final class GravatarAdapter extends BaseAdapter {
             .transform(transformation)
             .into((ImageView) convertView.findViewById(R.id.user_avatar));
 
-    ((TextView) convertView.findViewById(R.id.user_name)).setText(user.getUsername());
+    ((TextView) convertView.findViewById(R.id.user_name)).setText(profile.getString("displayName"));
 
     return convertView;
   }
