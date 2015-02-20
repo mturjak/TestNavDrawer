@@ -52,7 +52,7 @@
             android:layout_toRightOf="@+id/moment_avatar"
             android:layout_toEndOf="@id/moment_avatar"
             android:layout_below="@id/moment_item_name"
-            android:layout_marginTop="6dp" >
+            android:layout_marginTop="5dp" >
 
             <ImageView
                 android:layout_width="18dp"
@@ -65,7 +65,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="18dp"
                 android:textSize="13sp"
-                android:paddingTop="2dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginEnd="10dp"
                 android:text="20min ago"
@@ -74,7 +73,6 @@
             <ImageView
                 android:layout_width="18dp"
                 android:layout_height="18dp"
-                android:padding="2dp"
                 android:layout_marginRight="3dp"
                 android:layout_marginEnd="3dp"
                 android:src="@drawable/ic_roadsign_gray"/>
@@ -83,7 +81,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="18dp"
                 android:textSize="13sp"
-                android:paddingTop="2dp"
                 android:text="450m away"
                 android:textColor="#666" />
 

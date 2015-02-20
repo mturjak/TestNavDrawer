@@ -1,6 +1,7 @@
 package com.newtpond.testnavdrawer.fragments;
 
 import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
@@ -85,6 +86,11 @@ public class MainFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 // get item geo point from position and set map center
                 ((MainActivity)getActivity()).centerMap(51.525579,-0.082841);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    MainActivity.smoothScrollToPositionFromTop((android.widget.AbsListView) parent, position);
+                } else {
+                    parent.setSelection(position);
+                }
 
                 /*
                 if(mTwoPane) {

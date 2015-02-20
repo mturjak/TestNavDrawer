@@ -40,5 +40,6 @@
     <string name="signup_button_label">Sign Up!</string>
     <string name="signup_error_title">Sign-up failed!</string>
     <string name="title_activity_sign_up">Sign Up</string>
+    <string name="add_post">Add</string>
 
 </resources>

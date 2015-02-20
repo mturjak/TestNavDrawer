@@ -8,6 +8,9 @@
     <!-- Main theme with splash screen background -->
     <style name="MainTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:windowBackground">@drawable/vikler_splash_layer_list</item>
+        <!--<item name="windowActionBar">false</item>-->
+        <!--<item name="windowActionBarOverlay">true</item>-->
+        <!--<item name="colorPrimary">#aa000000</item>-->
     </style>
 
 </resources>

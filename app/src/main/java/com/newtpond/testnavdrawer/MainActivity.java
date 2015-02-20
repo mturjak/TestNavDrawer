@@ -4,9 +4,11 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.res.Resources;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -19,6 +21,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -55,6 +59,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
+import static android.support.v4.view.ViewCompat.canScrollVertically;
 import static com.newtpond.testnavdrawer.utils.NetworkAvailable.isNetworkAvailable;
 import static com.newtpond.testnavdrawer.utils.NetworkAvailable.noNetworkAlert;
 
@@ -226,8 +231,8 @@ public class MainActivity extends ActionBarActivity
             DisplayMetrics displaymetrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
             // TODO: convert pixels to dp to be on the safe side
-            // int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, <HEIGHT>, getResources().getDisplayMetrics());
-            mHeight = displaymetrics.heightPixels;
+            // display height in dp
+            mHeight = (int)(displaymetrics.heightPixels / Resources.getSystem().getDisplayMetrics().density);
         }
 
         setUpMapIfNeeded();
@@ -703,6 +708,8 @@ public class MainActivity extends ActionBarActivity
                 // calculate weight factor
                 if (params1.weight > 0) {
                     mWeightFactor = params1.weight / (mHeight - Y);
+                } else {
+                    mWeightFactor = 1.5f / mHeight;
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -718,10 +725,10 @@ public class MainActivity extends ActionBarActivity
 
                 if (delta > 0 && (params1.weight / mWeightFactor <= 40 ||
                     params1.weight / mWeightFactor <= delta)) {
-                    switchView(0, true);
+                        switchView(0, true);
                 } else if(delta < 0 && (params2.weight < 0.09 ||
-                        params2.weight <= -1 * delta * mWeightFactor)) {
-                    switchView(1, true);
+                    params2.weight <= -1 * delta * mWeightFactor)) {
+                        switchView(1, true);
                 } else {
                     // adjust the weights
                     params1.weight = params1.weight - delta * mWeightFactor;
@@ -777,7 +784,7 @@ public class MainActivity extends ActionBarActivity
             params1.weight = bottomWeight;
             params2.weight = 1 - bottomWeight;
 
-            mWeightFactor = 0.003f;
+            mWeightFactor = 1.5f / mHeight;
             mContainer.setLayoutParams(params1);
             mMapSegment.setLayoutParams(params2);
         }
@@ -812,7 +819,11 @@ public class MainActivity extends ActionBarActivity
                     ListView itemList = (ListView) mContainer.findViewById(android.R.id.list);
 
                     itemList.setItemChecked(4, true);
-                    itemList.setSelection(4); //smoothScrollToPosition(4);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                        smoothScrollToPositionFromTop(itemList, 4);
+                    } else {
+                        itemList.setSelection(4);
+                    }
                     return true;
                 }
             });
@@ -835,5 +846,58 @@ public class MainActivity extends ActionBarActivity
     public void centerMap(double lat, double lon) {
         if(mMap != null)
             mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(lat,lon)), 380, null);
+    }
+
+    /**
+     * Smooth scrolling to top with bug fix taken from
+     * http://stackoverflow.com/questions/14479078/smoothscrolltopositionfromtop-is-not-always-working-like-it-should
+     * @param view
+     * @param position
+     */
+    public static void smoothScrollToPositionFromTop(final AbsListView view, final int position) {
+        View child = getChildAtPosition(view, position);
+        // There's no need to scroll if child is already at top or view is already scrolled to its end
+        if ((child != null) && ((child.getTop() == 0) || ((child.getTop() > 0) && !canScrollVertically(view, 1)))) {
+            return;
+        }
+
+        view.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(final AbsListView view, final int scrollState) {
+                if (scrollState == SCROLL_STATE_IDLE) {
+                    view.setOnScrollListener(null);
+
+                    // Fix for scrolling bug
+                    new Handler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            view.setSelection(position);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onScroll(final AbsListView view, final int firstVisibleItem, final int visibleItemCount,
+                                 final int totalItemCount) { }
+        });
+
+        // Perform scrolling to position
+        new Handler().post(new Runnable() {
+            @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+            @Override
+            public void run() {
+                view.smoothScrollToPositionFromTop(position, 0);
+            }
+        });
+    }
+
+    public static View getChildAtPosition(final AdapterView view, final int position) {
+        final int index = position - view.getFirstVisiblePosition();
+        if ((index >= 0) && (index < view.getChildCount())) {
+            return view.getChildAt(index);
+        } else {
+            return null;
+        }
     }
 }
