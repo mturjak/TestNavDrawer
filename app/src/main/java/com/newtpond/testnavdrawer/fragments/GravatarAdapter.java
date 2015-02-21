@@ -70,7 +70,7 @@ final class GravatarAdapter extends BaseAdapter {
             .build();*/
 
     String gravatarUrl = "http://www.gravatar.com/avatar/"
-            + profile.getString("") /* use emailHash from profile */
+            + profile.getString("emailHash") /* use emailHash from profile */
             + "?s=" + mAvatarImageViewPixelSize /* set avatar size */
             + "&d=404" /* force 404 */;
 
