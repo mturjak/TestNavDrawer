@@ -160,6 +160,7 @@ public class LoginActivity extends Activity {
         // Associate the device with a user for targeted push notifications
         ParseInstallation installation = ParseInstallation.getCurrentInstallation();
         installation.put("user", ParseUser.getCurrentUser());
+        installation.addAllUnique("channels", Arrays.asList("", "UsersChannel"));
         installation.saveInBackground();
 
         // subscribe to push notifications

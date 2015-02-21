@@ -50,12 +50,17 @@ import com.newtpond.testnavdrawer.fragments.UsersListFragment;
 import com.newtpond.testnavdrawer.utils.marker.clusterer.MapClusterItem;
 import com.newtpond.testnavdrawer.utils.marker.clusterer.MapItemReader;
 import com.newtpond.testnavdrawer.utils.marker.clusterer.MyClusterRenderer;
+import com.parse.ParseException;
+import com.parse.ParseInstallation;
+import com.parse.ParsePush;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.json.JSONException;
 
 import java.io.InputStream;
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -341,6 +346,7 @@ public class MainActivity extends ActionBarActivity
                 break;
             case 6:
                 ParseUser.logOut();
+                ParsePush.unsubscribeInBackground("UsersChannel");
                 navigateTo(LoginActivity.class, true);
                 break;
         }
