@@ -18,15 +18,15 @@ public class MapItemReader {
      */
     private static final String REGEX_INPUT_BOUNDARY_BEGINNING = "\\A";
 
-    public List<MapClusterItem> read(InputStream inputStream) throws JSONException {
-        List<MapClusterItem> items = new ArrayList<MapClusterItem>();
+    public List<Moment> read(InputStream inputStream) throws JSONException {
+        List<Moment> items = new ArrayList<Moment>();
         String json = new Scanner(inputStream).useDelimiter(REGEX_INPUT_BOUNDARY_BEGINNING).next();
         JSONArray array = new JSONArray(json);
         for (int i = 0; i < array.length(); i++) {
             JSONObject object = array.getJSONObject(i);
             double lat = object.getDouble("lat");
             double lng = object.getDouble("lng");
-            items.add(new MapClusterItem(lat, lng));
+            //items.add(new MapClusterItem(lat, lng));
         }
         return items;
     }

@@ -3,7 +3,6 @@ package com.newtpond.testnavdrawer;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.res.Resources;
 import android.location.Location;
 import android.os.Build;
@@ -29,48 +28,40 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 import com.newtpond.testnavdrawer.fragments.EditProfileActivity;
 import com.newtpond.testnavdrawer.fragments.EditProfileFragment;
 import com.newtpond.testnavdrawer.fragments.MainFragment;
 import com.newtpond.testnavdrawer.fragments.PlaceholderFragment;
 import com.newtpond.testnavdrawer.fragments.UsersListFragment;
-import com.newtpond.testnavdrawer.utils.marker.clusterer.MapClusterItem;
-import com.newtpond.testnavdrawer.utils.marker.clusterer.MapItemReader;
+import com.newtpond.testnavdrawer.utils.LocationProvider;
+import com.newtpond.testnavdrawer.utils.marker.clusterer.Moment;
 import com.newtpond.testnavdrawer.utils.marker.clusterer.MyClusterRenderer;
+import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseInstallation;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
 import com.parse.ParsePush;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import org.json.JSONException;
 
-import java.io.InputStream;
-import java.text.DateFormat;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import static android.support.v4.view.ViewCompat.canScrollVertically;
 import static com.newtpond.testnavdrawer.utils.NetworkAvailable.isNetworkAvailable;
 import static com.newtpond.testnavdrawer.utils.NetworkAvailable.noNetworkAlert;
+import static com.parse.ParseObject.pinAllInBackground;
 
 
 public class MainActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, View.OnTouchListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, View.OnTouchListener, LocationProvider.LocationCallback {
 
 
     public static final String TAG = MainActivity.class.getSimpleName();
@@ -103,29 +94,22 @@ public class MainActivity extends ActionBarActivity
     /**
      * Google API Client properties
      */
-    private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
-    private LocationRequest mLocationRequest;
     private String mLastUpdateTime;
 
     // keys
-    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-    private final static String REQUESTING_LOCATION_UPDATES_KEY = "request_location_updates";
     private final static String LOCATION_KEY = "last_location";
     private final static String LAST_UPDATED_TIME_STRING_KEY = "last_updated_time";
     private final static String BOTTOM_WEIGHT_STRING_KEY = "bottom_weight";
     private final static String CURRENT_SECTION_KEY = "current_section";
-    private static final String MAP_MARKERS = "stored_map_markers";
-
-    // switch for turning location updating on or off
-    private boolean mRequestingLocationUpdates = false;
 
     /**
      * Google Map properties
      */
     private MapView mMapView;
     private GoogleMap mMap;
-    private ClusterManager<MapClusterItem> mClusterManager;
+    private LocationProvider mLocationProvider;
+    private ClusterManager<Moment> mClusterManager;
     private boolean mRepositionMap = true;
 
     /**
@@ -140,14 +124,28 @@ public class MainActivity extends ActionBarActivity
     private int mDividerTop;
     private int mHeight;
 
+    private RelativeLayout mLoaderView;
+    private LinearLayout mMainView;
+
+    /**
+     * Parse data objects
+     */
+    protected ParseUser mCurrentUser;
+    protected ParseObject mCurrentProfile;
+
+    protected List<ParseObject> mFriends;
+    protected List<ParseObject> mClosestUsers;
+    protected List<Moment> mClosestPoints;
+    protected List<ParseObject> mClosestVendors;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         // get current user
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        if (currentUser != null) {
+        mCurrentUser = ParseUser.getCurrentUser();
+        if (mCurrentUser != null) {
             // do stuff with the user
             // Log.i(TAG, currentUser.getUsername());
 
@@ -159,21 +157,17 @@ public class MainActivity extends ActionBarActivity
             navigateTo(LoginActivity.class, true);
         }
 
-        // method loads saved Google api values
+        // loads saved values
         updateValuesFromBundle(savedInstanceState);
-
-        // builds the client if necessary
-        if(mGoogleApiClient == null) {
-            buildGoogleApiClient();
-        }
-
-        // builds location request
-        createLocationRequest();
 
         // checking if layout includes a map view
         if (findViewById(R.id.main_list_map) != null) {
             mMapView = (MapView) findViewById(R.id.main_list_map);
             mMapView.onCreate(savedInstanceState);
+
+            // loader and actual content views
+            mMainView = (LinearLayout)findViewById(R.id.layout_divided);
+            mLoaderView = (RelativeLayout)findViewById(R.id.loadingMain);
 
             // get elements of the divided layout
             mContainer = (FrameLayout)findViewById(R.id.container);
@@ -188,8 +182,12 @@ public class MainActivity extends ActionBarActivity
                 MapsInitializer.initialize(this);
             }
 
+            // set up map if location from saved data
+            setUpMapIfNeeded();
+            mLocationProvider = new LocationProvider(this, this);
         }
 
+        // action bar title
         mTitle = getTitle();
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
@@ -212,15 +210,6 @@ public class MainActivity extends ActionBarActivity
     protected void onResume() {
         super.onResume();
 
-        // connect Google API client
-        if(!mGoogleApiClient.isConnected())
-            mGoogleApiClient.connect();
-
-        // if client connected and location updates
-        if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
-            startLocationUpdates();
-        }
-
         if(mMapView != null)
             mMapView.onResume();
 
@@ -235,13 +224,16 @@ public class MainActivity extends ActionBarActivity
         if(mDivider != null) {
             DisplayMetrics displaymetrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-            // TODO: convert pixels to dp to be on the safe side
+
             // display height in dp
             mHeight = (int)(displaymetrics.heightPixels / Resources.getSystem().getDisplayMetrics().density);
         }
 
+        // connect to the google location client & set up map if required and
+        mLocationProvider.connect();
         setUpMapIfNeeded();
 
+        // TODO: update the drawer values
         /*if(mDrawerLayout != null) {
             // refresh adapter on resume activity
             ((ProfileDrawerAdapter) ((ListView) mDrawerLayout.findViewById(android.R.id.list))
@@ -249,12 +241,12 @@ public class MainActivity extends ActionBarActivity
         }*/
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void navigateTo(final Class<? extends Activity> activityClass, boolean clearTask) {
         Intent intent = new Intent(this, activityClass);
         if(clearTask) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK | // supported only on api 11+
+                    Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS); // supposedly this should work on older apis
         }
         startActivity(intent);
     }
@@ -440,10 +432,7 @@ public class MainActivity extends ActionBarActivity
         if(mMapView != null)
             mMapView.onPause();
 
-        if (mGoogleApiClient.isConnected()) {
-            stopLocationUpdates();
-            mGoogleApiClient.disconnect();
-        }
+        mLocationProvider.disconnect();
     }
 
     @Override
@@ -465,10 +454,9 @@ public class MainActivity extends ActionBarActivity
     @Override
     protected void onSaveInstanceState(Bundle b) {
         // google API client location values
-        b.putBoolean(REQUESTING_LOCATION_UPDATES_KEY,
-                mRequestingLocationUpdates);
         b.putParcelable(LOCATION_KEY, mLastLocation);
         b.putString(LAST_UPDATED_TIME_STRING_KEY, mLastUpdateTime);
+
         b.putFloat(BOTTOM_WEIGHT_STRING_KEY, mBottomWeight);
         b.putInt(CURRENT_SECTION_KEY, mCurrentSection);
 
@@ -479,219 +467,6 @@ public class MainActivity extends ActionBarActivity
         if(mMapView != null)
             mMapView.onSaveInstanceState(b);
     }
-
-    /**
-     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-     * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link /setUpMap()} once when {@link /mMap} is not null.
-     */
-    private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
-        if (mMapView != null && mMap == null) {
-
-            mMap = mMapView.getMap();
-
-            if(mMap != null) {
-                setUpMap();
-            } else {
-                switchView(1, false);
-            }
-        }
-    }
-
-    private void setUpMap() {
-        if (mLastLocation != null) {
-            double lat = mLastLocation.getLatitude();
-            double lng = mLastLocation.getLongitude();
-            LatLng coordinate = new LatLng(lat, lng);
-
-            // marker options for current position
-            MarkerOptions options = new MarkerOptions()
-                    .position(coordinate)
-                    .title("I am here!");
-
-            CameraUpdate center = CameraUpdateFactory.newLatLng(coordinate);
-            CameraUpdate zoom = CameraUpdateFactory.zoomTo(13);
-
-            // set up map
-            //mMap.addMarker(options);
-            //mMap.moveCamera(center);
-            //mMap.animateCamera(zoom);
-
-            setUpClusterer(mRepositionMap);
-        }
-    }
-
-
-    /**
-     *
-     * Next part includes mostly google api client and location methods
-     *
-     *
-     */
-
-    /**
-     * Google API client builder
-     */
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
-    /**
-     * Create the LocationRequest object
-     */
-    protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest()
-            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-            .setInterval(10 * 1000) // 10 seconds
-            .setFastestInterval(1000); // 1 second
-    }
-
-    /**
-     * onConnected callback for the Google API client
-     */
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.i(TAG, "Location services connected.");
-
-        /* TODO: integrate this notifications in a useful place =)
-
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_price_tag_green)
-                        .setContentTitle("My notification")
-                        .setContentText("Hello World!");
-// Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(this, EditProfileActivity.class);
-
-// The stack builder object will contain an artificial back stack for the
-// started Activity.
-// This ensures that navigating backward from the Activity leads out of
-// your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-// Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(EditProfileActivity.class);
-// Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-        mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-// mId allows you to update the notification later on.
-        mNotificationManager.notify(1, mBuilder.build());
-
-        */
-
-        // get last location
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-
-        // if last location empty start location updating
-        if(mLastLocation == null) {
-
-            startLocationUpdates();
-        }
-        else {
-            // handle retrieved location
-            setUpMap();
-        }
-
-    }
-
-    /**
-     * Starts location updating using location request
-     */
-    protected void startLocationUpdates() {
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
-    }
-
-    // called from onPause method
-    protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(
-                mGoogleApiClient, this);
-    }
-
-    /**
-     * Stored data retrieval
-     * @param savedInstanceState
-     */
-    private void updateValuesFromBundle(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            // Update the value of mRequestingLocationUpdates from the Bundle, and
-            // make sure that the Start Updates and Stop Updates buttons are
-            // correctly enabled or disabled.
-            if (savedInstanceState.keySet().contains(REQUESTING_LOCATION_UPDATES_KEY)) {
-                mRequestingLocationUpdates = savedInstanceState.getBoolean(
-                        REQUESTING_LOCATION_UPDATES_KEY);
-            }
-
-            // Update the value of mCurrentLocation from the Bundle and update the
-            // UI to show the correct latitude and longitude.
-            if (savedInstanceState.keySet().contains(LOCATION_KEY)) {
-                // Since LOCATION_KEY was found in the Bundle, we can be sure that
-                // mCurrentLocationis not null.
-                mLastLocation = savedInstanceState.getParcelable(LOCATION_KEY);
-            }
-
-            // Update the value of mLastUpdateTime from the Bundle and update the UI.
-            if (savedInstanceState.keySet().contains(LAST_UPDATED_TIME_STRING_KEY)) {
-                mLastUpdateTime = savedInstanceState.getString(
-                        LAST_UPDATED_TIME_STRING_KEY);
-            }
-
-            /**
-             * I added this for to retain the divider state
-             */
-            if (savedInstanceState.keySet().contains(BOTTOM_WEIGHT_STRING_KEY)) {
-                mBottomWeight = savedInstanceState.getFloat(
-                        BOTTOM_WEIGHT_STRING_KEY);
-            }
-            if (savedInstanceState.keySet().contains(CURRENT_SECTION_KEY)) {
-                mCurrentSection = savedInstanceState.getInt(
-                        CURRENT_SECTION_KEY);
-            }
-            // TODO: use local storage also for markers
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.i(TAG, "Location services suspended. Please reconnect.");
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.e("GoogleApi","connection failed");
-        if (connectionResult.hasResolution()) {
-            try {
-                // Start an Activity that tries to resolve the error
-                connectionResult.startResolutionForResult(this, CONNECTION_FAILURE_RESOLUTION_REQUEST);
-            } catch (IntentSender.SendIntentException e) {
-                e.printStackTrace();
-            }
-        } else {
-            switchView(1,false);
-            Log.i(TAG, "Location services connection failed with code " + connectionResult.getErrorCode());
-        }
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        mLastLocation = location;
-        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-
-        setUpMap();
-    }
-
-
 
     /**
      * Draggable screen divider touch listener
@@ -797,64 +572,6 @@ public class MainActivity extends ActionBarActivity
     }
 
     /**
-     * Map Marker Clusterer
-     */
-    private void setUpClusterer(boolean reposition) {
-        if (mMap != null && mClusterManager == null) { // TODO: only add cluster manager if required
-
-            // Position the map.
-            if(reposition)
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.503186, -0.126446), 12));
-
-            // Initialize the manager with the context and the map.
-            // (Activity extends context, so we can pass 'this' in the constructor.)
-            mClusterManager = new ClusterManager<MapClusterItem>(this, mMapView.getMap());
-            mClusterManager.setRenderer(new MyClusterRenderer(this.getApplicationContext(), mMapView.getMap(), mClusterManager));
-
-            // Point the map's listeners at the listeners implemented by the cluster
-            // manager.
-            mMap.setOnCameraChangeListener(mClusterManager);
-            mMap.setOnMarkerClickListener(mClusterManager);
-
-            mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MapClusterItem>() {
-                @Override
-                public boolean onClusterItemClick(MapClusterItem mapClusterItem) {
-                    //mMapView.getMap().moveCamera(CameraUpdateFactory.newLatLng(mapClusterItem.getPosition()));
-                    mMap.animateCamera(CameraUpdateFactory.newLatLng(mapClusterItem.getPosition()), 300, null);
-                    Toast.makeText(MainActivity.this, mapClusterItem.getTitle(), Toast.LENGTH_SHORT).show();// display toast
-                    ListView itemList = (ListView) mContainer.findViewById(android.R.id.list);
-
-                    itemList.setItemChecked(4, true);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                        smoothScrollToPositionFromTop(itemList, 4);
-                    } else {
-                        itemList.setSelection(4);
-                    }
-                    return true;
-                }
-            });
-
-            // Add cluster items (markers) to the cluster manager.
-            try {
-                readItems();
-            } catch (JSONException e) {
-                Toast.makeText(this, "Problem reading list of markers.", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    private void readItems() throws JSONException {
-        InputStream inputStream = getResources().openRawResource(R.raw.radar_search);
-        List<MapClusterItem> items = new MapItemReader().read(inputStream);
-        mClusterManager.addItems(items);
-    }
-
-    public void centerMap(double lat, double lon) {
-        if(mMap != null)
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(lat,lon)), 380, null);
-    }
-
-    /**
      * Smooth scrolling to top with bug fix taken from
      * http://stackoverflow.com/questions/14479078/smoothscrolltopositionfromtop-is-not-always-working-like-it-should
      * @param view
@@ -904,6 +621,204 @@ public class MainActivity extends ActionBarActivity
             return view.getChildAt(index);
         } else {
             return null;
+        }
+    }
+
+    /**************** Parse data retrieval ************************************************/
+
+    /**
+     * retrieves closest moment and offer points
+     */
+    private void getParsePoints(final boolean fromLocal) {
+        // download closest points
+        ParseQuery<Moment> pointsQuery = ParseQuery.getQuery(Moment.class);
+        pointsQuery.whereWithinKilometers(
+                "location",
+                new ParseGeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude()),
+                50
+        );
+        pointsQuery.setLimit(10);
+
+        if(fromLocal)
+            pointsQuery.fromLocalDatastore();
+
+        pointsQuery.findInBackground(new FindCallback<Moment>() {
+            public void done(final List<Moment> pointsList, ParseException e) {
+                if (e == null) {
+                    Log.d("score_points", "Retrieved " + pointsList.size() + " scores; local=false;");
+                    pinAllInBackground("closest_points", pointsList);
+
+                    if(!fromLocal)
+                        mClosestPoints = pointsList;
+
+                    setUpClusterer(true);
+
+                } else {
+                    Log.e("score_points", "Error: " + e.getMessage());
+                }
+            }
+        });
+    }
+
+    /*************** Map and location *****************************************************/
+
+    /**
+     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
+     * installed) and the map has not already been instantiated.. This will ensure that we only ever
+     * call {@link /setUpMap()} once when {@link /mMap} is not null.
+     */
+    private void setUpMapIfNeeded() {
+        // Do a null check to confirm that we have not already instantiated the map.
+        if (mMapView != null && mMap == null) {
+
+            mMap = mMapView.getMap();
+
+            if(mMap != null) {
+                setUpMap();
+            } else {
+                switchView(1, false);
+            }
+        }
+    }
+
+    private void setUpMap() {
+        /*if (mLastLocation != null) {
+            double lat = mLastLocation.getLatitude();
+            double lng = mLastLocation.getLongitude();
+            LatLng coordinate = new LatLng(lat, lng);
+
+            // marker options for current position
+            MarkerOptions options = new MarkerOptions()
+                    .position(coordinate)
+                    .title("I am here!");
+
+            //CameraUpdate center = CameraUpdateFactory.newLatLng(coordinate);
+            //CameraUpdate zoom = CameraUpdateFactory.zoomTo(13);
+
+            // set up map
+            //mMap.addMarker(options);
+            //mMap.moveCamera(center);
+            //mMap.animateCamera(zoom);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinate, 12));
+            getParsePoints();*/
+
+        if(mLastLocation != null)
+            getParsePoints(true);
+    }
+
+    /**
+     * Map Marker Clusterer
+     */
+    private void setUpClusterer(boolean reposition) {
+        if (mMap != null && mClusterManager == null) { // TODO: only add cluster manager if required
+
+            //mMap.setMyLocationEnabled(true);
+
+            // Position the map.
+            if(reposition && mLastLocation != null)
+                mMap.moveCamera(CameraUpdateFactory
+                        .newLatLngZoom(
+                                new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()),
+                                12));
+
+            // Initialize the manager with the context and the map.
+            // (Activity extends context, so we can pass 'this' in the constructor.)
+            mClusterManager = new ClusterManager<Moment>(this, mMapView.getMap());
+            mClusterManager.setRenderer(new MyClusterRenderer(this.getApplicationContext(), mMapView.getMap(), mClusterManager));
+
+            // Point the map's listeners at the listeners implemented by the cluster
+            // manager.
+            mMap.setOnCameraChangeListener(mClusterManager);
+            mMap.setOnMarkerClickListener(mClusterManager);
+
+            mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<Moment>() {
+                @Override
+                public boolean onClusterItemClick(Moment mapClusterItem) {
+                    //mMapView.getMap().moveCamera(CameraUpdateFactory.newLatLng(mapClusterItem.getPosition()));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(mapClusterItem.getPosition()), 300, null);
+                    Toast.makeText(MainActivity.this, mapClusterItem.getTitle(), Toast.LENGTH_SHORT).show();// display toast
+                    ListView itemList = (ListView) mContainer.findViewById(android.R.id.list);
+
+                    itemList.setItemChecked(4, true);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                        smoothScrollToPositionFromTop(itemList, 4);
+                    } else {
+                        itemList.setSelection(4);
+                    }
+                    return true;
+                }
+            });
+
+            // Add cluster items (markers) to the cluster manager.
+            try {
+                readItems();
+            } catch (JSONException e) {
+                Toast.makeText(this, "Problem reading list of markers.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private void readItems() throws JSONException {
+        //InputStream inputStream = getResources().openRawResource(R.raw.radar_search);
+        //List<MapClusterItem> items = mClosestPoints; //new MapItemReader().read(inputStream);
+        mClusterManager.addItems(mClosestPoints);
+    }
+
+    public void centerMap(double lat, double lon) {
+        if(mMap != null)
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(lat,lon)), 380, null);
+    }
+
+
+    /**
+     * handleNewLocation - Callback function
+     * @param location Location passed in by the locationProvider
+     */
+    @Override
+    public void handleNewLocation(Location location) {
+        mLoaderView.setVisibility(View.GONE);
+        mMainView.setVisibility(View.VISIBLE);
+
+        mLastLocation = location;
+        getParsePoints(false);
+        Log.d("new_loc", String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude()));
+    }
+
+    /*************** restoring saved data *****************************************************/
+
+    /**
+     * Stored data retrieval
+     * @param savedInstanceState Bundle data from onSaveInstanceState
+     */
+    private void updateValuesFromBundle(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+
+            // Update the value of mCurrentLocation from the Bundle and update the
+            // UI to show the correct latitude and longitude.
+            if (savedInstanceState.keySet().contains(LOCATION_KEY)) {
+                // Since LOCATION_KEY was found in the Bundle, we can be sure that
+                // mCurrentLocationis not null.
+                mLastLocation = savedInstanceState.getParcelable(LOCATION_KEY);
+            }
+
+            // Update the value of mLastUpdateTime from the Bundle and update the UI.
+            if (savedInstanceState.keySet().contains(LAST_UPDATED_TIME_STRING_KEY)) {
+                mLastUpdateTime = savedInstanceState.getString(
+                        LAST_UPDATED_TIME_STRING_KEY);
+            }
+
+            /**
+             * I added this for to retain the divider state
+             */
+            if (savedInstanceState.keySet().contains(BOTTOM_WEIGHT_STRING_KEY)) {
+                mBottomWeight = savedInstanceState.getFloat(
+                        BOTTOM_WEIGHT_STRING_KEY);
+            }
+            if (savedInstanceState.keySet().contains(CURRENT_SECTION_KEY)) {
+                mCurrentSection = savedInstanceState.getInt(
+                        CURRENT_SECTION_KEY);
+            }
+            // TODO: use local storage also for markers
         }
     }
 }

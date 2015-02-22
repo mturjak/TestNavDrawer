@@ -3,8 +3,10 @@ package com.newtpond.testnavdrawer;
 import android.app.Application;
 
 //import com.deploygate.sdk.DeployGate;
+import com.newtpond.testnavdrawer.utils.marker.clusterer.Moment;
 import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseObject;
 import com.parse.PushService;
 
 /**
@@ -16,6 +18,7 @@ public class TestNavDrawerApplication extends Application {
         super.onCreate();
         // Enable Local Datastore.
         Parse.enableLocalDatastore(this);
+        ParseObject.registerSubclass(Moment.class);
         Parse.initialize(this, getString(R.string.parse_application_id), getString(R.string.parse_client_key));
 
         // Initialize Facebook
