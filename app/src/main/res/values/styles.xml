@@ -10,7 +10,7 @@
         <item name="android:windowBackground">@drawable/vikler_splash_layer_list</item>
         <!--<item name="windowActionBar">false</item>-->
         <!--<item name="windowActionBarOverlay">true</item>-->
-        <!--<item name="colorPrimary">#aa000000</item>-->
+        <item name="colorPrimary">#ff124b50</item>
     </style>
 
 </resources>

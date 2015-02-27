@@ -4,6 +4,9 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.BitmapFactory;
+import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -183,8 +186,9 @@ public class MainActivity extends ActionBarActivity
             }
 
             // set up map if location from saved data
-            setUpMapIfNeeded();
-            mLocationProvider = new LocationProvider(this, this);
+            // setUpMapIfNeeded();
+            if(mMapView != null)
+                mLocationProvider = new LocationProvider(this, this);
         }
 
         // action bar title
@@ -230,7 +234,9 @@ public class MainActivity extends ActionBarActivity
         }
 
         // connect to the google location client & set up map if required and
-        mLocationProvider.connect();
+        if(mMapView != null)
+            mLocationProvider.connect();
+
         setUpMapIfNeeded();
 
         // TODO: update the drawer values
@@ -350,6 +356,9 @@ public class MainActivity extends ActionBarActivity
 
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
+        BitmapDrawable background = new BitmapDrawable (BitmapFactory.decodeResource(getResources(), R.drawable.topbg));
+        background.setTileModeX(Shader.TileMode.REPEAT);
+        actionBar.setBackgroundDrawable(background);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
@@ -645,13 +654,16 @@ public class MainActivity extends ActionBarActivity
         pointsQuery.findInBackground(new FindCallback<Moment>() {
             public void done(final List<Moment> pointsList, ParseException e) {
                 if (e == null) {
-                    Log.d("score_points", "Retrieved " + pointsList.size() + " scores; local=false;");
-                    pinAllInBackground("closest_points", pointsList);
+                    Log.d("score_points", "Retrieved " + pointsList.size() + " scores; local=" + String.valueOf(fromLocal) + ";");
 
-                    if(!fromLocal)
-                        mClosestPoints = pointsList;
+                    if(!fromLocal) {
+                        pinAllInBackground("closest_points", pointsList);
+                    }
 
-                    setUpClusterer(true);
+                    // assign to member variable
+                    mClosestPoints = pointsList;
+
+                    setUpClusterer(mRepositionMap);
 
                 } else {
                     Log.e("score_points", "Error: " + e.getMessage());
@@ -780,7 +792,9 @@ public class MainActivity extends ActionBarActivity
         mMainView.setVisibility(View.VISIBLE);
 
         mLastLocation = location;
-        getParsePoints(false);
+        if(mRepositionMap) {
+            getParsePoints(mClusterManager != null);
+        }
         Log.d("new_loc", String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude()));
     }
 
