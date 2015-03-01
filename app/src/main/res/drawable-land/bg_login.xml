@@ -6,7 +6,7 @@
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@drawable/vikler_city_narrow_no_logo"
+            android:src="@drawable/vikler_city_wide_no_logo"
             android:tileMode="disabled" >
         </bitmap>
     </item>
