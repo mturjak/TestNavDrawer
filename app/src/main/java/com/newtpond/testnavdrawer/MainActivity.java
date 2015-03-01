@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -192,15 +193,6 @@ public class MainActivity extends ActionBarActivity
             if(mMapView != null)
                 mLocationProvider = new LocationProvider(this, this);
 
-            ActionBar actionBar = getSupportActionBar();
-            BitmapDrawable background = new BitmapDrawable (BitmapFactory.decodeResource(getResources(), R.drawable.topbg));
-            background.setTileModeX(Shader.TileMode.REPEAT);
-            actionBar.setBackgroundDrawable(background);
-            actionBar.setLogo(R.drawable.ic_vikler);
-            actionBar.setDisplayShowHomeEnabled(true);
-            actionBar.setDisplayUseLogoEnabled(true);
-            actionBar.setTitle("");
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
                 Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -225,6 +217,15 @@ public class MainActivity extends ActionBarActivity
                 R.id.navigation_drawer,
                 mDrawerLayout,
                 mIsDrawerLocked);
+
+        ActionBar actionBar = getSupportActionBar();
+        BitmapDrawable background = (BitmapDrawable)getResources().getDrawable(R.drawable.topbg);
+        background.setTileModeX(Shader.TileMode.REPEAT);
+        actionBar.setBackgroundDrawable(background);
+        actionBar.setLogo(R.drawable.ic_vikler);
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setDisplayUseLogoEnabled(true);
+        actionBar.setTitle("");
     }
 
     @Override
@@ -452,10 +453,10 @@ public class MainActivity extends ActionBarActivity
     protected void onPause() {
         super.onPause();
 
-        if(mMapView != null)
+        if(mMapView != null) {
             mMapView.onPause();
-
-        mLocationProvider.disconnect();
+            mLocationProvider.disconnect();
+        }
     }
 
     @Override

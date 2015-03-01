@@ -50,7 +50,7 @@ public class EditProfileActivity extends ActionBarActivity {
         }
 
         ActionBar actionBar = getSupportActionBar();
-        BitmapDrawable background = new BitmapDrawable (BitmapFactory.decodeResource(getResources(), R.drawable.topbg));
+        BitmapDrawable background = (BitmapDrawable)getResources().getDrawable(R.drawable.topbg);
         background.setTileModeX(Shader.TileMode.REPEAT);
         actionBar.setBackgroundDrawable(background);
         actionBar.setLogo(R.drawable.ic_vikler);
