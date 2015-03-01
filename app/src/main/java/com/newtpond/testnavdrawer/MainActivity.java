@@ -23,6 +23,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
@@ -189,6 +191,20 @@ public class MainActivity extends ActionBarActivity
             // setUpMapIfNeeded();
             if(mMapView != null)
                 mLocationProvider = new LocationProvider(this, this);
+
+            ActionBar actionBar = getSupportActionBar();
+            BitmapDrawable background = new BitmapDrawable (BitmapFactory.decodeResource(getResources(), R.drawable.topbg));
+            background.setTileModeX(Shader.TileMode.REPEAT);
+            actionBar.setBackgroundDrawable(background);
+            actionBar.setLogo(R.drawable.ic_vikler);
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setDisplayUseLogoEnabled(true);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.setStatusBarColor(getResources().getColor(R.color.vikler_material_dark));
+            }
         }
 
         // action bar title
@@ -325,7 +341,7 @@ public class MainActivity extends ActionBarActivity
     public void onSectionAttached(int number) {
         switch (number) {
             case 0:
-                mTitle = getString(R.string.app_name);
+                mTitle = "";//getString(R.string.app_name);
                 break;
             case 1:
                 mTitle = getString(R.string.title_section1);
@@ -356,9 +372,6 @@ public class MainActivity extends ActionBarActivity
 
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
-        BitmapDrawable background = new BitmapDrawable (BitmapFactory.decodeResource(getResources(), R.drawable.topbg));
-        background.setTileModeX(Shader.TileMode.REPEAT);
-        actionBar.setBackgroundDrawable(background);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);

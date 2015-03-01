@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ViklerTest</string>
+    <string name="app_name">Vikler</string>
     <string name="title_section1">Grab the moment</string>
     <string name="title_section2">Share the moment</string>
     <string name="title_section3">Friends</string>
@@ -26,7 +26,7 @@
     <string name="network_not_available">No network connection available.</string>
     <string name="network_error_title">Network error</string>
     <string name="title_activity_blogpostdetail">BlogPostDetailActivity</string>
-    <string name="title_activity_edituser">EditProfileActivity</string>
+    <string name="title_activity_edituser">Edit Profile</string>
     <string name="been_there_num">52 friends</string>
     <string name="edit_friends_error_title">Sorry, something went wrong.</string>
     <string name="empty_friends_label">Add friends to begin!</string>

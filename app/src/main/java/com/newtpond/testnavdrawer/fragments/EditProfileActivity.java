@@ -1,6 +1,10 @@
 package com.newtpond.testnavdrawer.fragments;
 
+import android.graphics.BitmapFactory;
+import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 
@@ -44,6 +48,14 @@ public class EditProfileActivity extends ActionBarActivity {
                     .add(R.id.container, fragment)
                     .commit();
         }
+
+        ActionBar actionBar = getSupportActionBar();
+        BitmapDrawable background = new BitmapDrawable (BitmapFactory.decodeResource(getResources(), R.drawable.topbg));
+        background.setTileModeX(Shader.TileMode.REPEAT);
+        actionBar.setBackgroundDrawable(background);
+        actionBar.setLogo(R.drawable.ic_vikler);
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setDisplayUseLogoEnabled(true);
     }
 
     @Override

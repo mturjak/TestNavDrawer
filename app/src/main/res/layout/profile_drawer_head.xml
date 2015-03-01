@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/drawer_item_name"
             android:layout_toEndOf="@+id/drawer_item_name"
-            android:padding="@dimen/drawer_item_ico_padding"
+            android:padding="@dimen/drawer_edit_padding"
             android:background="@drawable/list_selector_press_only" >
 
             <ImageView

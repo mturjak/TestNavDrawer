@@ -19,8 +19,9 @@
     <dimen name="item_ico_size">32dp</dimen>
     <dimen name="drawer_item_padding_x">10dp</dimen>
     <dimen name="drawer_item_ico_padding">8dp</dimen>
-    <dimen name="user_profile_edit_ico_size">27dp</dimen>
+    <dimen name="user_profile_edit_ico_size">30dp</dimen>
     <dimen name="user_profile_edit_ico_padding">4dp</dimen>
+    <dimen name="drawer_edit_padding">14dp</dimen>
 
     <!-- login form -->
     <dimen name="login_text_field_width">-2px</dimen>
@@ -44,4 +45,5 @@
 
     <!-- map -->
     <dimen name="map_item_height">180dp</dimen>
+
 </resources>

@@ -3,6 +3,9 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
+        <item name="colorPrimary">#ff124b50</item>
+        <!--   darker variant for the status bar and contextual app bars -->
+        <item name="colorPrimaryDark">#ff0f3639</item>
     </style>
 
     <!-- Main theme with splash screen background -->
@@ -11,6 +14,8 @@
         <!--<item name="windowActionBar">false</item>-->
         <!--<item name="windowActionBarOverlay">true</item>-->
         <item name="colorPrimary">#ff124b50</item>
+        <!--   darker variant for the status bar and contextual app bars -->
+        <item name="colorPrimaryDark">#ff0f3639</item>
     </style>
 
 </resources>
