@@ -199,6 +199,7 @@ public class MainActivity extends ActionBarActivity
             actionBar.setLogo(R.drawable.ic_vikler);
             actionBar.setDisplayShowHomeEnabled(true);
             actionBar.setDisplayUseLogoEnabled(true);
+            actionBar.setTitle("");
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
                 Window window = getWindow();
