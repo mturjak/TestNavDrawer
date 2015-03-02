@@ -12,8 +12,9 @@
         android:id="@+id/city_top"
         android:layout_alignParentTop="true"
         android:layout_marginTop="0dp"
-        android:src="@drawable/vikler_city_narrow_top"
-        android:scaleType="fitStart" />
+        android:src="@drawable/login_top"
+        android:scaleType="fitStart"
+        android:contentDescription="@string/vikler_clouds" />
 
     <ImageView
         android:layout_width="match_parent"
@@ -22,8 +23,9 @@
         android:id="@+id/city_bottom"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="0dp"
-        android:src="@drawable/vikler_city_narrow_bottom"
-        android:scaleType="fitEnd" />
+        android:src="@drawable/login_bottom"
+        android:scaleType="fitEnd"
+        android:contentDescription="@string/vikler_city" />
 
     <RelativeLayout
         android:layout_width="match_parent"
